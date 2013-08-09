@@ -1,0 +1,101 @@
+<h3>Link Group Statistics</h3>
+
+<div class='well'>
+  <%= form_tag "/frontend/per_link" do %>
+    <div class="field">
+      From: <%= text_field_tag 'hd_from', @post_var['hd_from'], id: 'hd_from' %>
+      To: <%= text_field_tag 'hd_to', @post_var['hd_to'], id: 'hd_to' %></br>
+      Percentile: <%= select_tag('percentile', options_for_select([['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]], selected: @post_var['percentile'] )) %> </br>
+      High Watermark:(0.0001-1.00)<%= text_field_tag 'watermark', @post_var['watermark'] %></br>
+      <%= submit_tag "Re-Calculate" %>
+    </div>
+  <% end %>
+</div>
+
+<table id="dt_frontend_lg">
+  <thead>
+    <tr>
+      <th>Link Group</th>
+      <th>Bandwidth</th>
+      <th>Rx Projected Days</th>
+      <th>Rx Average bps</th>
+      <th>Tx Projected Days</th>
+      <th>Tx Average bps</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @charts.each_key do |lg_id| %>
+      <tr>
+        <td><%= @charts[lg_id]['deviceHostname'] %></td>
+        <td><%= @charts[lg_id]['bandwidth'] / 1000000000 %>Gbps</td>
+        <td><%= @charts[lg_id]['ifInOctets']['values']['projection'] %></td>
+        <td><%= @charts[lg_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
+        <td><%= @charts[lg_id]['ifOutOctets']['values']['projection'] %></td>
+        <td><%= @charts[lg_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
+        <td><%= button_to_function "Chart it!", "chartit(#{lg_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+
+<div id="container" style="min-width: 300px; height: 360px;"></div>
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  All information on this page reflects the scope of the parameters provided. </br>
+  <b>Historical Distance in Days:</b> In aggregating the statistics for display on this page, how many days back should be examined. </br>
+  <b>Percentile:</b> Statistics are generated primarily by walking the measurements gathered from the devices in blocks of 100.  Percentile: controls the top X number of measurements that are taken into consideration when generating statistics.  99th = Top 1 measurements per 100 collected, 75th = Top 25 measurements per 100 collected, etc.</br>
+  <b>High Watermark:</b> Controls what to consider a fully loaded link.  Range 0.001 -- 1.000 e.g. 0.40 would be 40% of bandwidth </br>
+<% end %>
+
+<script type="text/javascript" charset="utf-8">
+
+var options = {
+    chart: {
+      renderTo: 'container',
+      defaultSeriesType: 'spline',
+      title: { text: 'asdf' },
+      xAxis: { type: 'datetime' },
+      yAxis: { title: { text: 'bps' }},
+    },
+    tooltip: {
+      formatter: function () {
+        return Highcharts.dateFormat("%B %e %Y", this.x) + ': ' +
+          Highcharts.numberFormat(this.y, 0) + 'bps';
+      }
+    }    
+};
+
+
+function chartit( int_id, watermark, percentile, start_epoch, end_epoch ) { 
+  var jsonURL = '<%%= frontend_get_linkgroup_chart %>' + '?lg_id=' + lg_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
+  $.getJSON( jsonURL, function( json ) {
+    options.series = [{
+      name: 'ifInOctets',
+      data: json['ifInOctets']['points']
+    },{
+      name: 'ifOutOctets',
+      data: json['ifOutOctets']['points']
+    },{
+      name: 'ifInOctets-average',
+      data: json['ifInOctets']['stats']['average_rate']
+    },{
+      name: 'ifInOctets-projection',
+      data: json['ifInOctets']['stats']['projection']
+    },{
+      name: 'ifOutOctets-average',
+      data: json['ifOutOctets']['stats']['average_rate']
+    },{
+      name: 'ifOutOctets-projection',
+      data: json['ifOutOctets']['stats']['projection']
+    },{
+      name: 'High Watermark',
+      data: json['watermark']
+    }];
+    var chart = new Highcharts.Chart(options);
+  });
+}
+</script>

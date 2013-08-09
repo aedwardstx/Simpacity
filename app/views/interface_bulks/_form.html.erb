@@ -1,0 +1,31 @@
+<div class='well'>
+  <%= form_tag "/interface_bulks/update", method: :patch do %>
+    <input type="hidden" name="device_id" value="<%= @bulk_ints['device_id']%>">
+    <table>
+      <thead>
+        <tr>
+          <th>Enabled?</th>
+          <th>Link Type</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Bandwidth</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <%@bulk_ints['ints'].each_with_index do |val, key|%>
+          <tr>
+            <td><%= check_box_tag "ints[#{val['name']}][used]", 'yes', (val['used'] == 'yes') %></td>
+            <td><%= select_tag "ints[#{val['name']}][link_type_id]", options_for_select(LinkType.all.collect {|link_type| [ link_type.name, link_type.id]}, val['link_type_id']) %></td>
+            <td><%= val['name'] %></td>
+            <td><%= val['description'] %></td>
+            <td><%= val['bandwidth'] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%= submit_tag "Submit" %>
+  <% end %>
+
+</div>
+

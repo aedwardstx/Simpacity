@@ -1,0 +1,132 @@
+class FrontendController < ApplicationController
+
+#TODO
+#a controller to export to CSV
+
+  # GET /frontend
+  # GET /frontend.json
+  #TODO - generate data with default percentile, historical distance, and capacity watermark
+  #def index
+  #  redirect_to :controller=>'frontend', :action => 'per_link'
+  #  #render :per_link
+  #end
+
+  def per_link
+    require '/root/projects/SimpacityMath'
+
+    #@user_preference = User_preference.find(:session_id => request.session_options[:id]) || User_preferences.new(:session_id => request.session_options[:id], :historical_distance => 30, :high_watermark => 0.40, :percentile => 5) 
+
+    #historical_distance = params[:historical_distance] || 30
+    #historical_distance =  historical_distance*24*60*60  # convert days to seconds
+    #watermark = params[:watermark] || 0.40
+    #percentile = params[:percentile] || 1
+    @post_var = Hash.new
+    #File.open('/root/tempfile3', 'w') do |f2|
+    #  f2.puts "hd=#{@post_var['historical_distance_days']},wm=#{@post_var['watermark']},per=#{@post_var['percentile']}"
+    #end
+    @post_var['historical_distance_days'] = params[:historical_distance_days] || 30 
+    @post_var['historical_distance_seconds'] = (@post_var['historical_distance_days'].to_i * 24 * 60 * 60) 
+    @post_var['watermark'] = params[:watermark] || 0.40
+    @post_var['watermark'] = @post_var['watermark'].to_f
+    @post_var['percentile'] = params[:percentile] || 5
+    @post_var['percentile'] = @post_var['percentile'].to_i
+    #File.open('/root/tempfile4', 'w') do |f2|
+    #  f2.puts "hd=#{@post_var['historical_distance_seconds']},wm=#{@post_var['watermark']},per=#{@post_var['percentile']}"
+    #end
+
+    @charts = getData(@post_var['historical_distance_seconds'],@post_var['watermark'],@post_var['percentile'])
+    #File.open('/root/temp-charts1', 'w') do |f2|
+    #    f2.puts @charts.inspect
+    #end
+    #puts @charts.inspect
+    #@percentiles = Array.new
+    #@percentiles << {'name' => '99th', 'id'=>1}
+    #@percentiles << {'name' => '95th', 'id'=>2}
+    return @charts
+  end
+
+  def export
+
+
+  end
+
+  private
+
+
+  def measurements_chart_series(int_id, percentile, record, start_epoch, end_time)
+    (arrayOfX, arrayOfY) = get_int_measurements(int_id, percentile, record, start_epoch, end_epoch)
+  end
+
+
+  def get_int_measurements(int_id, percentile, record, start_epoch, end_epoch)
+    measureTemp = int.measurements.where(:collected_at => start_epoch..end_epoch, :percentile => percentile, :record => record).pluck(:collected_at, :gauge)
+    tempTime = []
+    tempGauge = []
+    measureTemp.each do |element|
+      tempTime << element[0].to_i
+      tempGauge << element[1]
+    end
+    return tempTime, tempGauge
+  end
+
+  def get_stats(int_id, percentile, record, bandwidth, start_epoch, end_epoch, watermark)
+    (arrayOfX, arrayOfY) =  get_int_measurements(int_id, percentile, record, start_epoch, end_epoch)
+    calc = SimpacityMath.new(100)
+    calc.loadValues(arrayOfX, arrayOfY)
+    projection = calc.projectDepletion(watermark, bandwidth, percentile, (86400 * 180)) / 3600 / 24
+    average_rate = calc.getAverageRate
+    calc.trashEverything #trashes everything
+    return projection, average_rate
+  end
+
+  def getData(historical_distance_seconds,watermark,percentile)
+    #File.open('/root/temp-getData1', 'w') do |f2|
+    #  f2.puts "historical_distance_seconds=#{historical_distance_seconds},watermark=#{watermark},percentile=#{percentile}"
+    #end
+    def hash_with_default_hash
+            Hash.new { |hash, key| hash[key] = hash_with_default_hash }
+    end
+    @charts = hash_with_default_hash
+    #@charts = []
+
+    Interface.all.each do |int|
+      #puts int.device.hostname.inspect
+      records = ['ifInOctets','ifOutOctets']
+      @charts[int.id]['deviceHostname'] = int.device.hostname
+      @charts[int.id]['interfaceName'] = int.name
+      @charts[int.id]['bandwidth'] = int.bandwidth
+      @charts[int.id]['zenossLink'] = int.zenossLink
+      @charts[int.id]['interfaceLinkType'] = int.link_type
+      records.each do |record|
+        #TODO -- add a WHERE param to limit the returned data
+        #get_stats(int.id, percentile, record, bandwidth, start_epoch, end_epoch, watermark)
+        measureTemp= int.measurements.where(:percentile => percentile, :record => record).pluck(:collected_at, :gauge)
+        tempTime = [] 
+        tempGauge = []
+        measureTemp.each do |element|
+          tempTime << element[0].to_i
+          tempGauge << element[1]
+        end
+        #puts tempTime.inspect
+        #puts tempGauge.inspect
+
+        @charts[int.id][record]['values']['times'] = tempTime 
+        @charts[int.id][record]['values']['gauges'] = tempGauge 
+        calc = SimpacityMath.new(100)
+        #puts @charts[int.id][record]['values']['times'].inspect
+        #puts @charts[int.id][record]['values']['gauges'].inspect
+        #puts "DEBUG watermark=#{watermark},bandwidth=#{bandwidth},percentile=#{percentile},historical_distance=#{historical_distance},record=#{record}"
+        
+        #File.open('/root/temp-getData2', 'w') do |f2|
+        #  f2.puts "watermark=#{watermark},bandwidth=#{@charts[int.id]['bandwidth']}percentile=#{percentile},historical_distance_seconds=#{historical_distance_seconds}"
+        #end
+        #calc.loadValues(@chart[int.id][record]['values']['times'], @chart[int.id][record]['values']['gauges'])
+        calc.loadValues(tempTime,tempGauge)
+        @charts[int.id][record]['values']['projection'] = calc.projectDepletion(watermark, @charts[int.id]['bandwidth'], percentile, historical_distance_seconds) / 3600 / 24
+        @charts[int.id][record]['values']['average_rate'] = calc.getAverageRate
+        calc.trashEverything #trashes everything
+      end
+    end
+    return @charts
+  end
+end

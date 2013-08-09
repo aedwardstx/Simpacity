@@ -1,0 +1,38 @@
+<h3>Contact Groups</h3>
+
+<table id='dt_contact_groups'>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Email addresses</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @contact_groups.each do |contact_group| %>
+      <tr>
+        <td><%= contact_group.name %></td>
+        <td><%= contact_group.description %></td>
+        <td><%= contact_group.email_addresses %></td>
+        <td><%= link_to 'Edit', edit_contact_group_path(contact_group), :class => 'btn btn-mini'%></td>
+        <td><%= link_to 'Destroy', contact_group, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Contact group', new_contact_group_path, :class => 'btn btn-mini' %>
+
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  <b></b>
+  </br>
+  Ensure that mailhost is configured correctly in general settings
+<% end %>
+

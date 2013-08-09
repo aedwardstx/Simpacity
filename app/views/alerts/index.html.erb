@@ -1,0 +1,53 @@
+<h3>Listing alerts</h3>
+
+<table id='dt_alerts'>
+  <thead>
+    <tr>
+      <th>Enabled</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Int Type</th>
+      <th>Link Type</th>
+      <th>Match Regex</th>
+      <th>Percentile</th>
+      <th>Watermark</th>
+      <th>Days Back</th>
+      <th>Days Out</th>
+      <th>Contact Group</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @alerts.each do |alert| %>
+      <tr>
+        <td><%= alert.enabled %></td>
+        <td><%= alert.name %></td>
+        <td><%= alert.description %></td>
+        <td><%= alert.int_type %></td>
+        <td><%= alert.link_type_id %></td>
+        <td><%= alert.match_regex %></td>
+        <td><%= alert.percentile %></td>
+        <td><%= alert.watermark %></td>
+        <td><%= alert.days_back %></td>
+        <td><%= alert.days_out %></td>
+        <td><%= alert.contact_group.name %></td>
+        <td><%= link_to 'Edit', edit_alert_path(alert), :class => 'btn btn-mini' %></td>
+        <td><%= link_to 'Destroy', alert, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Alert', new_alert_path, :class => 'btn btn-mini' %>
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  <b></b>
+  </br>
+  
+<% end %>
+

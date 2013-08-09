@@ -1,0 +1,44 @@
+<h3>Device Settings</h3>
+
+<table id="dt_devices">
+  <thead>
+    <tr>
+      <th>Hostname</th>
+      <th>SNMP CS Name</th>
+      <th>Description</th>
+      <th>Monitored Interfaces</th>
+      <th>Poller Health</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @devices.each do |device| %>
+      <tr>
+        <td><%= device.hostname %></td>
+        <td><%= device.snmp.name %></td>
+        <td><%= device.description %></td>
+        <td><%= device.interfaces.length %></td>
+        <td><%= get_poller_health_for_device(device.id) %></td>
+        <td><%= link_to 'Edit', edit_device_path(device), :class => 'btn btn-mini' %></td>
+        <td><%= link_to 'Edit Interfaces', edit_interface_bulk_path(device), :class => 'btn btn-mini' %></td>
+        <td><%= link_to 'Destroy', device, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger'%></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Device', new_device_path, :class => 'btn btn-mini' %>
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  <b>Interface Groups --> Interfaces --> Devices</b>
+  </br>
+  Configure devices here.  Once properly added, zpoller will begin polling the device.  If a device is removed, zpoller will stop polling the device.
+<% end %>
+
+

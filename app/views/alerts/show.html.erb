@@ -1,0 +1,54 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Enabled:</strong>
+  <%= @alert.enabled %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @alert.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @alert.description %>
+</p>
+
+<p>
+  <strong>Int type:</strong>
+  <%= @alert.int_type %>
+</p>
+
+<p>
+  <strong>Link type id,:</strong>
+  <%= @alert.link_type_id, %>
+</p>
+
+<p>
+  <strong>Match regex:</strong>
+  <%= @alert.match_regex %>
+</p>
+
+<p>
+  <strong>Percentile:</strong>
+  <%= @alert.percentile %>
+</p>
+
+<p>
+  <strong>Watermark:</strong>
+  <%= @alert.watermark %>
+</p>
+
+<p>
+  <strong>Days out:</strong>
+  <%= @alert.days_out %>
+</p>
+
+<p>
+  <strong>Contact group:</strong>
+  <%= @alert.contact_group_id %>
+</p>
+
+<%= link_to 'Edit', edit_alert_path(@alert) %> |
+<%= link_to 'Back', alerts_path %>

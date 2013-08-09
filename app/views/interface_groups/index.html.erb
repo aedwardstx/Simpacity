@@ -1,0 +1,38 @@
+<h3>Interface Group Settings</h3>
+
+<table id='dt_interface_group'>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Interfaces</th>
+      <th>Refresh Next Import?</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @interface_groups.each do |interface_group| %>
+      <tr>
+        <td><%= interface_group.name %></td>
+        <td><%= interface_group.interfaces.count %> </td>
+        <td><%= interface_group.refresh_next_import %></td>
+        <td><%= link_to 'Edit', edit_interface_group_path(interface_group),:class => 'btn btn-mini' %></td>
+        <td><%= link_to 'Destroy', interface_group, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Interface group', new_interface_group_path, :class => 'btn btn-mini' %>
+
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  <b>Interface Groups --> Interfaces --> Devices</b>
+  </br>
+  Configure Interface Groups here.  Interface Groups, or Shared Risk Link Groups, are a mechanism to group interfaces of like purpose together for the purpose of tracking statistics and making projections on the group as a whole.  The statistics are aggregated by the nightly import job at high granularity. 
+<% end %>
+

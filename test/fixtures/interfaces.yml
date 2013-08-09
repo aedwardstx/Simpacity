@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  device: 1
+  type: 
+  description: MyString
+  name: MyString
+  bandwidth: 1
+  zenossLink: MyString
+
+two:
+  device: 1
+  type: 
+  description: MyString
+  name: MyString
+  bandwidth: 1
+  zenossLink: MyString

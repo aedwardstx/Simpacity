@@ -1,0 +1,42 @@
+<h3>General Settings</h3>
+<table id='dt_settings'>
+  <thead>
+    <tr>
+      <th>title</th>
+      <th>setting</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr><td>Slice Size</td><td><%= @setting.slice_size %></td></tr>
+    <tr><td>Default Percentile</td><td><%= @setting.default_percentile %></td></tr>
+    <tr><td>Default Watermark</td><td><%= @setting.default_watermark %></td></tr>
+    <tr><td>Max past days for trending</td><td><%= @setting.max_hist_dist %></td></tr>
+    <tr><td>Default past days for trending</td><td><%= @setting.default_hist_dist %></td></tr>
+    <tr><td>Zpoller rc location</td><td><%= @setting.zpoller_rc_location %></td></tr>
+    <tr><td>Zconfig location</td><td><%= @setting.zconfig_location %></td></tr>
+    <tr><td>Zpoller hosts location</td><td><%= @setting.zpoller_hosts_location %></td></tr>
+    <tr><td>Zpoller base directory</td><td><%= @setting.zpoller_base_dir %></td></tr>
+    <tr><td>MongoDB poller health check window</td><td><%= @setting.mongodb_test_window %></td></tr>
+    <tr><td>MongoDB DB Hostname</td><td><%= @setting.mongodb_db_hostname %></td></tr>
+    <tr><td>MongoDB DB Port</td><td><%= @setting.mongodb_db_port %></td></tr>
+    <tr><td>MongoDB DB Name</td><td><%= @setting.mongodb_db_name %></td></tr>
+    <tr><td>Link Group Importer Lookback Window</td><td><%= @setting.link_group_importer_lookback_window %></td></tr>
+    <tr><td>Zpoller Poller Interval</td><td><%= @setting.zpoller_poller_interval %></td></tr>
+    <tr><td>Mailhost</td><td><%= @setting.mailhost %></td></tr>
+  </tbody>
+</table>
+</br></br>
+<%= link_to 'Edit', edit_setting_path(@setting), :class => 'btn btn-mini' %>
+
+
+<% content_for :sidebar do %>
+  <h4>General Settings</h4>
+  <b>EXPERTS ONLY!</b>
+  </br>
+  Configure general Simpacity settings here, WARNING, experts only! You can easily beak things here.
+  </br>
+  </br>
+  <b>Max past days for trending:</b> notice, this value will also need to be updated in the datepicker jQuery config.
+<% end %>
+

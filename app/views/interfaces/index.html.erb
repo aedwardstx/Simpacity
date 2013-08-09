@@ -1,0 +1,41 @@
+<h3>Interface Settings</h3>
+<table id='dt_interfaces'>
+  <thead>
+    <tr>
+      <th>Device</th>
+      <th>Name</th>
+      <th>Link_type</th>
+      <th>Description</th>
+      <th>Bandwidth</th>
+      <th>Poller Health</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @interfaces.each do |interface| %>
+      <tr>
+        <td><%= interface.device.hostname %></td>
+        <td><%= interface.name %></td>
+        <td><%= interface.link_type.name %></td>
+        <td><%= interface.description %></td>
+        <td><%=(interface.bandwidth / 1000000000)%>Gbps</td>
+        <td><%= get_poller_health_of_interface(interface.id) %></td>
+        <td><%= link_to 'Edit', edit_interface_path(interface), :class => 'btn btn-mini'%></td>
+        <td><%= link_to 'Destroy', interface, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%- #link_to 'New Interface', new_interface_path, :class => 'btn btn-mini' -%>
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  <b>Interface Groups --> Interfaces --> Devices</b>
+  </br>
+  New interfaces can be added through the Device Settings page.  Edit and delete existing interfaces here.  Once properly added, statistics will be generated for these interfaces on the Frontend Per-link page.
+<% end %>

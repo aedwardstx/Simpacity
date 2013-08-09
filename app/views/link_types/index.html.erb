@@ -1,0 +1,35 @@
+<h3>Link Type Settings</h3>
+
+<table id='dt_link_type'>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @link_types.each do |link_type| %>
+      <tr>
+        <td><%= link_type.name %></td>
+        <td><%= link_type.description %></td>
+        <td><%= link_to 'Edit', edit_link_type_path(link_type), :class => 'btn btn-mini' %></td>
+        <td><%= link_to 'Destroy', link_type, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Link type', new_link_type_path, :class => 'btn btn-mini' %>
+
+
+<% content_for :sidebar do %>
+  <h3>Information</h3>
+  </br>
+  <b>Link Types:</b> Link Types are categories that links(or interfaces) are placed in to assist with reporting and organization.  You may have link types for ISP connections, BGP peers, inter-datacenter links, etc.  
+<% end %>
+

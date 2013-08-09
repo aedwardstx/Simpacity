@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simpacity</title>
+  <%= stylesheet_link_tag    "application", "token-input-facebook", media: "all" %>
+  <%= javascript_include_tag "application", "jquery.tokeninput" %>
+  <%= csrf_meta_tags %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <div class="brand">Simpacity</div>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="<%= 'active' if params[:controller] == 'frontend' and params[:action] == 'per_link' %>"><%= link_to "Per-Link Statistics", frontend_per_link_path %></li>
+            <li class="<%= 'active' if params[:controller] == 'frontend' and params[:action] == 'link_group' %>"><%= link_to "Link-Group Statistics", frontend_link_group_path %></li>
+            <li class="dropdown <%= 'active' if params[:controller] =~ /\A(?:contact_groups|alerts)\z/ %>">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Alerting<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li class="<%= 'active' if params[:controller] == 'contact_groups' %>"><%= link_to "Contact Groups", contact_groups_path %></li>
+                  <li class="<%= 'active' if params[:controller] == 'alerts' %>"><%= link_to "Alerts", alerts_path %></li>
+                </ul>
+              </li>
+            <li class="dropdown <%= 'active' if params[:controller] =~ /\A(?:devices|interfaces|interface_groups|snmps|link_types|settings)\z/ %> ">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li class="<%= 'active' if params[:controller] == 'devices' %>"><%= link_to "Device Settings", devices_path %></li>
+                <li class="<%= 'active' if params[:controller] == 'interfaces' %>"><%= link_to "Interface Settings", interfaces_path %></li>
+                <li class="<%= 'active' if params[:controller] == 'interface_groups' %>"><%= link_to "Interface Group Settings", interface_groups_path %></li>
+                <li class="<%= 'active' if params[:controller] == 'snmps' %>"><%= link_to "SNMP Settings", snmps_path %></li>
+                <li class="<%= 'active' if params[:controller] == 'link_types' %>"><%= link_to "Link Type Settings", link_types_path %></li>
+                <li class="<%= 'active' if params[:controller] == 'settings' %>"><%= link_to "General Settings", settings_path %></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="span9"><%= yield %></div>
+      <div class="span3"><%= yield :sidebar %></div>
+    </div>
+  </div>
+</body>
+</html>

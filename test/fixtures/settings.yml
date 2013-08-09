@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  slice_size: 1
+  default_percentile: 1
+  default_watermark: 1.5
+  max_hist_dist: 1
+  default_hist_dist: 1
+  zpoller_rc_location: MyString
+  zconfig_location: MyString
+  zpoller_hosts_location: MyString
+
+two:
+  slice_size: 1
+  default_percentile: 1
+  default_watermark: 1.5
+  max_hist_dist: 1
+  default_hist_dist: 1
+  zpoller_rc_location: MyString
+  zconfig_location: MyString
+  zpoller_hosts_location: MyString

@@ -1,0 +1,44 @@
+<div class='well'>
+  <%= form_for(@interface) do |f| %>
+    <% if @interface.errors.any? %>
+      <div class="alert alert-error">
+        <h2><%= pluralize(@interface.errors.count, "error") %> prohibited this interface from being saved:</h2>
+
+        <ul>
+        <% @interface.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :device_tokens, "Device" %>
+      <% dp_array = Array.new %>
+      <% if ((defined?(@interface.device.id)) and (defined?(@interface.device.hostname))) %>  
+        <% dp_array << @interface.device %>
+        <% dp_array = dp_array.collect {|device| {:id => device.id, :name => device.hostname }} %>
+      <% end %>  
+      <%= f.text_field :device_tokens, "data-pre" => dp_array.to_json %>
+    </div>
+    <div class="field">
+      <%= f.label :link_type %>
+      <%= f.select :link_type_id, LinkType.all.collect {|link_type| [ link_type.name, link_type.id]} %>
+    </div>
+    <div class="field">
+      <%= f.label :description %> 
+      <%= f.text_field :description %>
+    </div>
+    <div class="field">
+      <%= f.label :name %> 
+      <%= f.text_field :name %>
+    </div>
+    <div class="field">
+      <%= f.label :bandwidth %> 
+      <%= f.number_field :bandwidth %>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</div>

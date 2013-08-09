@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  rx: 1
+  tx: 1
+  period: 1
+  interface: 1
+  sharedRiskLinkGroup: MyString
+  collectedAt: 2013-07-08 21:58:10
+
+two:
+  rx: 1
+  tx: 1
+  period: 1
+  interface: 1
+  sharedRiskLinkGroup: MyString
+  collectedAt: 2013-07-08 21:58:10

@@ -1,0 +1,84 @@
+class InterfacesController < ApplicationController
+  before_action :set_interface, only: [:show, :edit, :update, :destroy]
+  
+  # GET /interfaces
+  def index
+    @interfaces = Interface.all
+    matches = []
+    Interface.all.each do |int|
+      if "#{int.device.hostname}-#{int.name}" =~ /#{params[:q]}/i
+        matches << int.id
+      elsif params[:q] == ''
+        matches << int.id
+      end
+    end
+    
+    matching_ints = Interface.find_all_by_id(matches)
+    #interfaces = Interface.where("name like ?", "%#{params[:q]}%")
+    #devices = Interface.device.where("hostname like ?", "%#{params[:q]}%")
+    respond_to do |format|
+      format.html
+      format.json { render :json => matching_ints.collect {|int| {:id => int.id, :name => "#{int.device.hostname}-#{int.name}"}}}
+    end
+  end
+
+  # GET /interfaces/1
+  def show
+  end
+
+  # GET /interfaces/new
+  def new
+    @interface = Interface.new
+    #added devices here to allow for select box population
+    #@devices = Device.all
+  end
+
+  # GET /interfaces/1/edit
+  def edit
+    #added devices here to allow for select box population
+    #@devices = Device.all
+  end
+
+  # POST /interfaces
+  def create
+    @interface = Interface.new(interface_params)
+
+    respond_to do |format|
+      if @interface.save
+        format.html { redirect_to interfaces_url, notice: 'Interface was successfully created.' }
+      else
+        format.html { render action: 'new' }
+      end
+    end
+  end
+
+  # PATCH/PUT /interfaces/1
+  def update
+    respond_to do |format|
+      if @interface.update(interface_params)
+        format.html { redirect_to interfaces_url, notice: 'Interface was successfully updated.' }
+      else
+        format.html { render action: 'edit' }
+      end
+    end
+  end
+
+  # DELETE /interfaces/1
+  def destroy
+    @interface.destroy
+    respond_to do |format|
+      format.html { redirect_to interfaces_url }
+    end
+  end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_interface
+      @interface = Interface.find(params[:id])
+    end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def interface_params
+      params.require(:interface).permit(:device_id, :link_type_id, :description, :name, :device_tokens, :bandwidth, :q)
+    end
+end

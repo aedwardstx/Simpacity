@@ -1,0 +1,32 @@
+<div class='well'>
+  <%= form_for(@device) do |f| %>
+    <% if @device.errors.any? %>
+      <div class="alert alert-error">
+        <h2><%= pluralize(@device.errors.count, "error") %> prohibited this device from being saved:</h2>
+
+        <ul>
+        <% @device.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label 'hostname-FQDN'%>
+      <%= f.text_field :hostname %>
+    </div>
+    <div class="field">
+      <%= f.label :description %>
+      <%= f.text_field :description %>
+    </div>
+    <div class="field">
+      <%= f.label :snmp %>
+      <%= f.select :snmp_id, Snmp.all.collect {|snmp| [ snmp.community_string, snmp.id]}%>
+    </div>
+
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,63 @@
+<div class='well'>
+  <%= form_for(@alert) do |f| %>
+    <% if @alert.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@alert.errors.count, "error") %> prohibited this alert from being saved:</h2>
+
+        <ul>
+        <% @alert.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :enabled %>
+      <%= f.check_box :enabled %>
+    </div>
+    <div class="field">
+      <%= f.label :name %>
+      <%= f.text_field :name %>
+    </div>
+    <div class="field">
+      <%= f.label :description %>
+      <%= f.text_field :description %>
+    </div>
+    <div class="field">
+      <%= f.label :int_type %>
+      <%= f.select :int_type, ['interface','interface-group'] %>
+    </div>
+    <div class="field">
+      <%= f.label :link_type_id %>
+      <%= f.select :link_type_id, LinkType.all.collect {|link_type| [link_type.name, link_type.id]}  %>
+    </div>
+    <div class="field">
+      <%= f.label :match_regex %>
+      <%= f.text_field :match_regex %>
+    </div>
+    <div class="field">
+      <%= f.label :percentile %>
+      <%= f.select :percentile, [['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]] %>
+    </div>
+    <div class="field">
+      <%= f.label :watermark %>
+      <%= f.text_field :watermark %>
+    </div>
+    <div class="field">
+      <%= f.label :days_back %>
+      <%= f.number_field :days_back %>
+    </div>
+    <div class="field">
+      <%= f.label :days_out %>
+      <%= f.number_field :days_out %>
+    </div>
+    <div class="field">
+      <%= f.label :contact_group_id %>
+      <%= f.select :contact_group_id, ContactGroup.all.collect {|contact_group| [contact_group.name, contact_group.id]} %>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</div>

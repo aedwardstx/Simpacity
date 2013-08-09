@@ -1,0 +1,110 @@
+<h3>Per-Link Statistics</h3>
+
+<div class='well'>
+  <%= form_tag("/frontend/per_link", style: 'display: inline;') do %>
+    From: <%= text_field_tag 'hd_from', @post_var['hd_from'], id: 'hd_from' %>
+    To: <%= text_field_tag 'hd_to', @post_var['hd_to'], id: 'hd_to' %></br>
+    Percentile: <%= select_tag('percentile', options_for_select([['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]], selected: @post_var['percentile'] )) %> 
+    High Watermark:<%= text_field_tag 'watermark', @post_var['watermark'] %></br>
+    <%= submit_tag "Re-Calculate" %>
+  <% end %>
+  <%= form_tag("/frontend/per_link.xls", style: 'display: inline;') do %>
+    <input type="hidden" name="hd_from" value="<%= @post_var['hd_from']%>">
+    <input type="hidden" name="hd_to" value="<%= @post_var['hd_to']%>">
+    <input type="hidden" name="percentile" value="<%= @post_var['percentile']%>">
+    <input type="hidden" name="watermark" value="<%= @post_var['watermark']%>">
+    <%= submit_tag "Export to XLS" %>
+  <% end %>
+</div>
+<div>
+<table id="dt_frontend_pl">
+  <thead>
+    <tr>
+      <th>Hostname</th>
+      <th>Interface</th>
+      <th>Link Type</th>
+      <th>Bandwidth</th>
+      <th>Rx Projected</th>
+      <th>Rx Average bps</th>
+      <th>Tx Projected</th>
+      <th>Tx Average bps</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @charts.each_key do |int_id| %>
+      <tr>
+        <td><%= @charts[int_id]['deviceHostname'] %></td>
+        <td><%= @charts[int_id]['interfaceName'] %></td>
+        <td><%= @charts[int_id]['interfaceLinkType'] %></td>
+        <td><%= @charts[int_id]['bandwidth'] / 1000000000 %>Gbps</td>
+        <td><%= @charts[int_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
+        <td><%= @charts[int_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
+        <td><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
+        <td><%= @charts[int_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
+        <td><%= button_to_function "Chart it!", "chartit(#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<div id="container" style="min-width: 300px; height: 360px;"></div>
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  All information on this page reflects the scope of the parameters provided. </br>
+  <b>Percentile:</b> Statistics are generated primarily by walking the measurements gathered from the devices in blocks of 100(of the value of SliceSize).  Percentile controls the top X number of measurements that are taken into consideration when generating statistics within the SliceSize.  99th = Top 1 measurements per 100 collected, 75th = Top 25 measurements per 100 collected, etc.</br>
+  <b>High Watermark:</b> Controls what to consider a fully loaded link.  Range 0.001 -- 1.000 e.g. 0.40 would be 40% of bandwidth </br>
+<% end %>
+
+<script type="text/javascript" charset="utf-8">
+
+var options = {
+    chart: {
+      renderTo: 'container',
+      defaultSeriesType: 'spline',
+      title: { text: 'asdf' },
+      xAxis: { type: 'datetime' },
+      yAxis: { title: { text: 'bps' }},
+    },
+    tooltip: {
+      formatter: function () {
+        return Highcharts.dateFormat("%B %e %Y", this.x) + ': ' +
+          Highcharts.numberFormat(this.y, 0) + 'bps';
+      }
+    }    
+};
+
+
+function chartit( int_id, watermark, percentile, start_epoch, end_epoch ) { 
+  var jsonURL = '<%= frontend_get_perlink_chart_path %>' + '?int_id=' + int_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
+  $.getJSON( jsonURL, function( json ) {
+    options.series = [{
+      name: 'In-bps',
+      data: json['ifInOctets']['points']
+    },{
+      name: 'Out-bps',
+      data: json['ifOutOctets']['points']
+    },{
+      name: 'In-bps-Average',
+      data: json['ifInOctets']['stats']['average_rate']
+    },{
+      name: 'In-bps-Projection',
+      data: json['ifInOctets']['stats']['projection']
+    },{
+      name: 'Out-bps-Average',
+      data: json['ifOutOctets']['stats']['average_rate']
+    },{
+      name: 'Out-bps-Projection',
+      data: json['ifOutOctets']['stats']['projection']
+    },{
+      name: 'High Watermark',
+      data: json['watermark']
+    }];
+    var chart = new Highcharts.Chart(options);
+    chart.series[6].hide()
+  });
+}
+</script>

@@ -1,0 +1,84 @@
+<div class='well'>
+  <%= form_for(@setting) do |f| %>
+    <% if @setting.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@setting.errors.count, "error") %> prohibited this setting from being saved:</h2>
+
+        <ul>
+        <% @setting.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :slice_size %>
+      <%= f.number_field :slice_size %>
+    </div>
+    <div class="field">
+      <%= f.label :default_percentile %>
+      <%= f.number_field :default_percentile %>
+    </div>
+    <div class="field">
+      <%= f.label :default_watermark %>
+      <%= f.text_field :default_watermark %>
+    </div>
+    <div class="field">
+      <%= f.label :max_hist_dist %>
+      <%= f.number_field :max_hist_dist %>
+    </div>
+    <div class="field">
+      <%= f.label :default_hist_dist %>
+      <%= f.number_field :default_hist_dist %>
+    </div>
+    <div class="field">
+      <%= f.label :zpoller_rc_location %>
+      <%= f.text_field :zpoller_rc_location %>
+    </div>
+    <div class="field">
+      <%= f.label :zconfig_location %>
+      <%= f.text_field :zconfig_location %>
+    </div>
+    <div class="field">
+      <%= f.label :zpoller_hosts_location %>
+      <%= f.text_field :zpoller_hosts_location %>
+    </div>
+    <div class="field">
+      <%= f.label :zpoller_base_dir %>
+      <%= f.text_field :zpoller_base_dir %>
+    </div>
+    <div class="field">
+      <%= f.label :mongodb_test_window %>
+      <%= f.number_field :mongodb_test_window %>
+    </div>
+    <div class="field">
+      <%= f.label :mongodb_db_hostname %>
+      <%= f.text_field :mongodb_db_hostname %>
+    </div>
+    <div class="field">
+      <%= f.label :mongodb_db_port %>
+      <%= f.number_field :mongodb_db_port %>
+    </div>
+    <div class="field">
+      <%= f.label :mongodb_db_name %>
+      <%= f.text_field :mongodb_db_name %>
+    </div>
+    <div class="field">
+      <%= f.label :link_group_importer_lookback_window %>
+      <%= f.text_field :link_group_importer_lookback_window %>
+    </div>
+    <div class="field">
+      <%= f.label :zpoller_poller_interval %>
+      <%= f.text_field :zpoller_poller_interval %>
+    </div>
+    <div class="field">
+      <%= f.label :mailhost %>
+      <%= f.text_field :mailhost %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</div>

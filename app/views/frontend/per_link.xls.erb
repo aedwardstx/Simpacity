@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Worksheet ss:Name="Results">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">Hostname</Data></Cell>
+        <Cell><Data ss:Type="String">Interface</Data></Cell>
+        <Cell><Data ss:Type="String">Link Type</Data></Cell>
+        <Cell><Data ss:Type="String">Bandwidth</Data></Cell>
+        <Cell><Data ss:Type="String">Rx Projected</Data></Cell>
+        <Cell><Data ss:Type="String">Rx Average bps</Data></Cell>
+        <Cell><Data ss:Type="String">Tx Projected</Data></Cell>
+        <Cell><Data ss:Type="String">Tx Average bps</Data></Cell>
+      </Row>
+    <% @charts.each_key do |int_id| %>
+      <Row>
+        <Cell><Data ss:Type="String"><%= @charts[int_id]['deviceHostname'] %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= @charts[int_id]['interfaceName'] %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= @charts[int_id]['interfaceLinkType'] %></Data></Cell>
+        <Cell><Data ss:Type="Number"><%= @charts[int_id]['bandwidth'] %></Data></Cell>
+        <Cell><Data ss:Type="Number"><%= @charts[int_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></Data></Cell>
+        <Cell><Data ss:Type="Number"><%= @charts[int_id]['ifInOctets']['values']['average_rate'] %></Data></Cell>
+        <Cell><Data ss:Type="Number"><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></Data></Cell>
+        <Cell><Data ss:Type="Number"><%= @charts[int_id]['ifOutOctets']['values']['average_rate'] %></Data></Cell>
+      </Row>
+    <% end %>
+    </Table>
+  </Worksheet>
+  <Worksheet ss:Name="Raw Statistics">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">Device</Data></Cell>
+        <Cell><Data ss:Type="String">Interface</Data></Cell>
+        <Cell><Data ss:Type="String">Record</Data></Cell>
+        <Cell><Data ss:Type="String">Time</Data></Cell>
+        <Cell><Data ss:Type="String">Gauge</Data></Cell>
+      </Row>
+      <% @charts.each_key do |int_id| %>
+        <% records = ['ifInOctets','ifOutOctets'] %>
+        <% records.each do |record| %>
+          <% (time, gauge) = get_int_measurements(int_id, @post_var['percentile'], record, @post_var['start_epoch'], @post_var['end_epoch']) %>
+          <% time.each_index do |index| %>
+            <Row>
+              <Cell><Data ss:Type="String"><%= @charts[int_id]['deviceHostname'] %></Data></Cell>
+              <Cell><Data ss:Type="String"><%= @charts[int_id]['interfaceName'] %></Data></Cell>
+              <Cell><Data ss:Type="String"><%= record %></Data></Cell>
+              <Cell><Data ss:Type="String"><%= Time.at(time[index]).to_s %></Data></Cell>
+              <Cell><Data ss:Type="Number"><%= gauge[index] %></Data></Cell>
+            </Row>
+          <% end %>
+        <% end %>
+      <% end %>
+    </Table>
+  </Worksheet>
+  <Worksheet ss:Name="Parameters">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">Start Time</Data></Cell>
+        <Cell><Data ss:Type="String">End Time</Data></Cell>
+        <Cell><Data ss:Type="String">Percentile</Data></Cell>
+        <Cell><Data ss:Type="String">High Watermark</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String"><%= Time.at(@post_var['start_epoch']).to_s %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= Time.at(@post_var['end_epoch']).to_s %></Data></Cell>
+        <Cell><Data ss:Type="Number"><%= @post_var['percentile'] %></Data></Cell>
+        <Cell><Data ss:Type="Number"><%= @post_var['watermark'] %></Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>

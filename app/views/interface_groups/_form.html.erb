@@ -1,0 +1,35 @@
+<div class='well'>
+  <%= form_for(@interface_group) do |f| %>
+    <% if @interface_group.errors.any? %>
+      <div class="alert alert-error">
+        <h2><%= pluralize(@interface_group.errors.count, "error") %> prohibited this interface_group from being saved:</h2>
+
+        <ul>
+        <% @interface_group.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :name %>
+      <%= f.text_field :name %>
+    </div>
+    <div class="field">
+      <%= f.label :description %>
+      <%= f.text_field :description %>
+    </div>
+    <div class="field">
+      <%= f.label :interface_tokens, "Interfaces" %> 
+      <%= f.text_field :interface_tokens, "data-pre" => @interface_group.interfaces.all.collect {|int| {:id => int.id, :name => "#{int.device.hostname}-#{int.name}"}}.to_json %>
+    </div>
+    <div class="field">
+      <%= f.label :refresh_next_import %> 
+      <%= f.check_box :refresh_next_import %>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</div>
