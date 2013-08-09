@@ -19,18 +19,16 @@ gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .js.coffee assets and views
 gem 'coffee-rails', '~> 4.0.0'
 
+#Non-default Gems and requires. 
 gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem 'jquery-ui-rails'
-#gem 'jquery_datepicker'
 gem 'less-rails'
 gem 'therubyracer'
 gem 'highcharts-rails'
-
 gem 'twitter-bootstrap-rails'
 
 require 'mongo'
 require '/root/projects/SimpacityMath'
-#include Mongo
 
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
