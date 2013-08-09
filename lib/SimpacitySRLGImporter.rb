@@ -35,23 +35,24 @@ gem 'activerecord'
 require 'active_record'
 require 'benchmark'
 
-custom_base = '/root/projects'
-require "#{custom_base}/SimpacityMath"
+#CHANGE ME TO FIT YOUR ENVIRONMENT!!
+simpacity_base = '/root/projects/simpacity'
+
+require "#{simpacity_base}/lib/SimpacityMath"
 
 ActiveRecord::Base.establish_connection(
     :adapter => 'sqlite3',
-    :database => '/root/projects/simpacity/db/development.sqlite3'
+    :database => "#{simpacity_base}/db/development.sqlite3"
 )
 
 #Require the Simpacity model files 
-simpacity_base = '/root/projects'
-require "#{simpacity_base}/simpacity/app/models/interface_group.rb"
-require "#{simpacity_base}/simpacity/app/models/interface_group_relationship.rb"
-require "#{simpacity_base}/simpacity/app/models/interface.rb"
-require "#{simpacity_base}/simpacity/app/models/measurement.rb"
-require "#{simpacity_base}/simpacity/app/models/srlg_measurement.rb"
-require "#{simpacity_base}/simpacity/app/models/device.rb"
-require "#{simpacity_base}/simpacity/app/models/setting.rb"
+require "#{simpacity_base}/app/models/interface_group.rb"
+require "#{simpacity_base}/app/models/interface_group_relationship.rb"
+require "#{simpacity_base}/app/models/interface.rb"
+require "#{simpacity_base}/app/models/measurement.rb"
+require "#{simpacity_base}/app/models/srlg_measurement.rb"
+require "#{simpacity_base}/app/models/device.rb"
+require "#{simpacity_base}/app/models/setting.rb"
 
 
 #Percentiles 99%,95%,90%,75%,50%,0%(Full Sampling), grab this from AR in the future

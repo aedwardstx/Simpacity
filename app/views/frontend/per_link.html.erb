@@ -6,14 +6,14 @@
     To: <%= text_field_tag 'hd_to', @post_var['hd_to'], id: 'hd_to' %></br>
     Percentile: <%= select_tag('percentile', options_for_select([['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]], selected: @post_var['percentile'] )) %> 
     High Watermark:<%= text_field_tag 'watermark', @post_var['watermark'] %></br>
-    <%= submit_tag "Re-Calculate" %>
+    <%= submit_tag "Re-Calculate", class: "btn btn-xs" %>
   <% end %>
   <%= form_tag("/frontend/per_link.xls", style: 'display: inline;') do %>
     <input type="hidden" name="hd_from" value="<%= @post_var['hd_from']%>">
     <input type="hidden" name="hd_to" value="<%= @post_var['hd_to']%>">
     <input type="hidden" name="percentile" value="<%= @post_var['percentile']%>">
     <input type="hidden" name="watermark" value="<%= @post_var['watermark']%>">
-    <%= submit_tag "Export to XLS" %>
+    <%= submit_tag "Export to XLS", class: "btn btn-xs" %>
   <% end %>
 </div>
 <div>
@@ -43,7 +43,7 @@
         <td><%= @charts[int_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
         <td><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= @charts[int_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
-        <td><%= button_to_function "Chart it!", "chartit(#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok" %></td>
+        <td><%= button_to_function "Chart it!", "chartit(#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-xs" %></td>
       </tr>
     <% end %>
   </tbody>
