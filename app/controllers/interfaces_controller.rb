@@ -29,14 +29,10 @@ class InterfacesController < ApplicationController
   # GET /interfaces/new
   def new
     @interface = Interface.new
-    #added devices here to allow for select box population
-    #@devices = Device.all
   end
 
   # GET /interfaces/1/edit
   def edit
-    #added devices here to allow for select box population
-    #@devices = Device.all
   end
 
   # POST /interfaces
