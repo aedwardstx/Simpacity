@@ -25,8 +25,8 @@
             <li class="dropdown <%= 'active' if params[:controller] =~ /\A(?:contact_groups|alerts)\z/ %>">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">Alerting<b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li class="<%= 'active' if params[:controller] == 'contact_groups' %>"><%= link_to "Contact Groups", contact_groups_path %></li>
                   <li class="<%= 'active' if params[:controller] == 'alerts' %>"><%= link_to "Alerts", alerts_path %></li>
+                  <li class="<%= 'active' if params[:controller] == 'contact_groups' %>"><%= link_to "Contact Groups", contact_groups_path %></li>
                 </ul>
               </li>
             <li class="dropdown <%= 'active' if params[:controller] =~ /\A(?:devices|interfaces|interface_groups|snmps|link_types|settings)\z/ %> ">

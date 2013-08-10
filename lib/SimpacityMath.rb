@@ -1,10 +1,7 @@
 #!/usr/bin/env ruby
 
-#This is part of the Simpacity package
+#This is part of the Simpacity project
   
-#   TODO -- in the future, make this
-#   add a method to provide the future exhaustion time
-#   make modifications to accept multiple data sets, this is to allow for interface-group based reporting and math
 
 class SimpacityMath
 
@@ -57,30 +54,23 @@ class SimpacityMath
   #Combine @groupMeasurements into a single group of xvals and yvals
   def aggregateGroupValues(window)
     sorted_measurements = @groupMeasurements.sort_by { |k| k["time"] }
-    #puts sorted_measurements.inspect
     @groupMeasurements = nil
-    #aggregated_measurements = []  #will hold aggregated measurements
     measurements_window = []   # will hold a history of values with a time with in the window
     @xvals = [] #will hold aggregated X vals
     @yvals = [] #will hold aggregated Y vals
 
     #measurements_remap = {key=>combine_with}
     sorted_measurements.each do |sm_element|
-      #puts sm_element.inspect
       #pop old entries from the measurements_window to the aggregated_measurements array
       match_found = false
       measurements_window.delete_if do |mw_element|
         delete_the_current_mw_element = false
-        #puts "#{mw_element['time']} #{sm_element['time'] - window}"
         if mw_element['time'] < sm_element['time'] - window
-          #aggregated_measurements << mw_element #TODO - pop to aggx and aggy
           @xvals << mw_element['time']
           @yvals << mw_element['yval']
-          #puts "added mw element to agg measures and marking the current mw element for deletion"
           delete_the_current_mw_element = true
         end
         if not (delete_the_current_mw_element) and not (match_found) and not (mw_element['int_ids'].include? sm_element['int_ids'][0])
-          #puts "adding sm element to mw elements"
           mw_element['int_ids'] << sm_element['int_ids'][0]
           mw_element['yval'] += sm_element['yval']
           match_found = true
@@ -98,14 +88,9 @@ class SimpacityMath
 
     #pop the remaining elements of the measurements_window into the aggregated_measurements data structure
     measurements_window.each do |mw_element|
-      #aggregated_measurements << mw_element
       @xvals << mw_element['time']
       @yvals << mw_element['yval']
     end
-    #puts @xvals.inspect
-    #puts @yvals.inspect
-    #puts @xvals.length
-    #puts @yvals.length
     if (@xvals.length > 0) and (@yvals.length > 0)
       @valuesLoaded=true
       return true 
@@ -143,12 +128,8 @@ class SimpacityMath
 
 
   def findSIForPercentile(percentile) 
-    #change this if needed
     aggYs = Array.new
     aggXs = Array.new
-
-    #puts @yvals.count
-    #puts @xvals.inspect
 
     #find the per-sliceSize percentile averages
     @yvals.each_slice(@sliceSize) do | batch |
@@ -164,9 +145,6 @@ class SimpacityMath
       aggXs << batch.inject{ |sum, element| sum + element }.to_f / batch.size
     end
    
-    #puts aggXs.inspect
-    #puts aggYs.inspect
-
     #prepare some vabiables
     sumx=0.0; sumy=0.0; sumxy=0.0;sumsqrx=0.0
     xyLength = aggXs.length
@@ -198,7 +176,6 @@ class SimpacityMath
   #Find and return Y given X
   def getYGivenX(x)
     @y=@slope*x+@intercept
-    #puts "y is: #{@y}, slope is: #{@slope}, intercept is: #{@intercept}, x is: #{x}"
     return @y.to_i
   end
 
@@ -214,9 +191,6 @@ class SimpacityMath
   #Will find the projected time in epoch when bandwidth will exceed watermark*bandwith
   #   The max time is controlled by maxProjectedTimeDistance, it is added to the largest xvals value to get the desired effect
   def projectDepletion(watermark, bandwidth, percentile, maxProjectedTimeDistance)
-    #TODO -- 
-    #   Check watermark, bandwidth, percentile, and maxProjectedTimeDistance to ensure they are sensible 
-    #   
 
     #given bandwidth of y and highWatermark, find X value for depletion
     if self.valuesLoaded
@@ -241,8 +215,6 @@ class SimpacityMath
       else
         abort "Not sure what happened, this is impossible"
       end
-      #puts "Debug timeProjection=#{timeProjection},lastSampleTime=#{lastSampleTime}"
-      #puts "Time when you will hit the highWatermark is #{time},#{timeProjection}"
       return timeProjection.ceil #return the ceil as this value is in seconds
     else
       abort "No values loaded"

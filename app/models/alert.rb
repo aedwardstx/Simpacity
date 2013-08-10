@@ -1,5 +1,6 @@
 class Alert < ActiveRecord::Base
   belongs_to :contact_group
+  belongs_to :link_type
 
   #commented out -- if the checkbox is unchecked, the validation fails
   #validates_presence_of :enabled
