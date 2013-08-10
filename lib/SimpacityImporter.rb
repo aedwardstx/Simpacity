@@ -12,26 +12,11 @@
 #          run the calulation on the data and record it
 #        else
 #          do nothing
-#foreach interfaceGroup   -- TODO - Do this later, once the per-interface logic is complete
-# if the refresh flag set(i.e. interface associations were changed)
-#   delete all measurements for the interfaceGroup in AR
-# foreach day of data in the mongodb, for the set of interfaces in the group(should data for all int be mandidtory for the period?)
-#   foreach percentile configured
-#     foreach recorded counter configured(RxOctets, TxOctets, etc.)
-#       determine if data is recorded in AR
-#       if not
-#         run the calulation on the data and record it
-#       else
-#         do nothing
-#
-#
 
 require 'rubygems'
 require 'mongo'
-#require 'pp'
 include Mongo
 gem 'activerecord'
-#require 'sqlite3'
 require 'active_record'
 
 #CHANGE ME TO FIT YOUR ENVIRONMENT!!

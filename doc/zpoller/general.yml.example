@@ -1,0 +1,15 @@
+--- # This defines the start of a YAML file.
+loglevel: debug
+database:
+  # Indentation is relevant.
+  host: localhost
+  port: 27017
+  name: zpoller
+  # username: username
+  # password: password
+concurrency:
+  reindex: 16
+  poll: 512
+  database: 2
+snmp:
+  timeouts: [ 5000, 5000, 5000, 5000 ]

@@ -20,7 +20,7 @@
         <td><%= interface.name %></td>
         <td><%= interface.link_type.name %></td>
         <td><%= interface.description %></td>
-        <td><%=(interface.bandwidth / 1000000000)%>Gbps</td>
+        <td><%=(interface.bandwidth / 1000000)%>Mbps</td>
         <td><%= get_poller_health_of_interface(interface.id) %></td>
         <td><%= link_to 'Edit', edit_interface_path(interface), :class => 'btn btn-mini'%></td>
         <td><%= link_to 'Destroy', interface, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>

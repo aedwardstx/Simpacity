@@ -1,0 +1,49 @@
+--- # This defines the start of a YAML file.
+- # This defines the start of a polling package
+  # Indentation is relevant.
+
+  # Which hosts does it apply to? This a regexp that is applied
+  # to the host name. Any host that matches get this package applied to it.
+  hosts: .
+
+  # Select an OID to index on. This means we will fetch the subtree below
+  # this OID and use whatever we get back as the identifier for this object.
+  # In case you use ifName (like below) it means we'll follow the same
+  # interface around even if it changes ifIndex, as long as the name remains
+  # the same.
+  index: .1.3.6.1.2.1.31.1.1.1.1
+
+  # Interfaces are only used if they pass the following filter rules.
+  # The only allowed operations are those demonstrated by the example.
+  filter:
+    # Filter by ifSpeed > 0 bps */
+    #- oid: .1.3.6.1.2.1.2.2.1.5
+    #  op: "<"
+    #  rhs: 1000000000000
+
+  # Collect the following OIDs to the named tables. If more than one OID
+  # maps to the same table, we'll use the first that the host successfully
+  # responds to. This can be used to try 64 bit counters but fall back to 32
+  # bit counters if they don"t exist.
+  collect:
+    - oid: .1.3.6.1.2.1.31.1.1.1.6
+      table: ifInOctets
+    - oid: .1.3.6.1.2.1.2.2.1.10
+      table: ifInOctets
+    - oid: .1.3.6.1.2.1.31.1.1.1.10
+      table: ifOutOctets
+    - oid: .1.3.6.1.2.1.2.2.1.16
+      table: ifOutOctets
+
+  # Define which interval to collect values at.
+  interval: 15
+
+  # Collect these metadata fields for each interface. They are not used by the
+  # poller but can be shown for informational purposes.
+  metadata: 
+    mtu: .1.3.6.1.2.1.2.2.1.4
+    description: .1.3.6.1.2.1.31.1.1.1.18
+    speed: .1.3.6.1.2.1.2.2.1.5
+
+  # Define graphs. Not used by the poller, but used by the HTTP server.
+  graphs: []
