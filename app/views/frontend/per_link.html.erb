@@ -50,7 +50,7 @@
         <td><%= @charts[int_id]['deviceHostname'] %></td>
         <td><%= @charts[int_id]['interfaceName'] %></td>
         <td><%= @charts[int_id]['interfaceLinkType'] %></td>
-        <td><%= @charts[int_id]['bandwidth'] / 1000000000 %>Gbps</td>
+        <td><%= @charts[int_id]['bandwidth'] / 1000000 %>Mbps</td>
         <td><%= @charts[int_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= @charts[int_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
         <td><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>

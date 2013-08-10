@@ -9,8 +9,8 @@ Simpacity::Application.routes.draw do
   resources :interfaces
   resources :interface_bulks
 
-  get '/frontend/get_linkgroup_chart', to: 'frontend#get_linkgroup_chart'
-  post '/frontend/get_linkgroup_chart', to: 'frontend#get_linkgroup_chart'
+  get '/frontend/get_int_group_chart', to: 'frontend#get_int_group_chart'
+  post '/frontend/get_int_group_chart', to: 'frontend#get_int_group_chart'
   get '/frontend/get_perlink_chart', to: 'frontend#get_perlink_chart'
   post '/frontend/get_perlink_chart', to: 'frontend#get_perlink_chart'
   get '/frontend/per_link', to: 'frontend#per_link'

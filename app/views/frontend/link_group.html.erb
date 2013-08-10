@@ -1,45 +1,60 @@
 <h3>Link Group Statistics</h3>
-
 <div class='well'>
-  <%= form_tag "/frontend/per_link" do %>
-    <div class="field">
-      From: <%= text_field_tag 'hd_from', @post_var['hd_from'], id: 'hd_from' %>
-      To: <%= text_field_tag 'hd_to', @post_var['hd_to'], id: 'hd_to' %></br>
-      Percentile: <%= select_tag('percentile', options_for_select([['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]], selected: @post_var['percentile'] )) %> </br>
-      High Watermark:(0.0001-1.00)<%= text_field_tag 'watermark', @post_var['watermark'] %></br>
-      <%= submit_tag "Re-Calculate" %>
-    </div>
+  <%= form_tag("/frontend/link_group", class: "form-inline") do %>
+    <%= label_tag 'hd_from', 'From Date:' %>
+    <%= text_field_tag 'hd_from', @post_var['hd_from'], id: 'hd_from', class: "input-small" %>
+    <%= label_tag 'hd_to', 'To Date:' %>
+    <%= text_field_tag 'hd_to', @post_var['hd_to'], id: 'hd_to', class: "input-small" %>
+    <%= label_tag 'percentile', 'Percentile:' %>
+    <%= select_tag('percentile', options_for_select([['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]], selected: @post_var['percentile'] ), class: "input-small" ) %> 
+    <p>
+    <%= label_tag 'watermark', 'High Watermark:' %>
+    <%= text_field_tag 'watermark', @post_var['watermark'], id: 'watermark_amount', class: "input-small" %>
+    <div id="watermark" style="max-width: 200px; margin: 10px;"></div>
+    </p>
+    <table><tr>
+    <td>
+    <%= submit_tag "Re-Calculate", class: "btn btn-xs" %>
+    </td>
+  <% end %>
+  <%= form_tag("/frontend/link_group.xls", class: "form-inline") do %>
+    <input type="hidden" name="hd_from" value="<%= @post_var['hd_from']%>">
+    <input type="hidden" name="hd_to" value="<%= @post_var['hd_to']%>">
+    <input type="hidden" name="percentile" value="<%= @post_var['percentile']%>">
+    <input type="hidden" name="watermark" value="<%= @post_var['watermark']%>">
+    <td>
+    <%= submit_tag "Export to XLS", class: "btn btn-xs" %>
+    </td></table>
   <% end %>
 </div>
 
 <table id="dt_frontend_lg">
   <thead>
     <tr>
-      <th>Link Group</th>
+      <th>Interface Group</th>
       <th>Bandwidth</th>
-      <th>Rx Projected Days</th>
-      <th>Rx Average bps</th>
-      <th>Tx Projected Days</th>
-      <th>Tx Average bps</th>
+      <th>Rx Projected</th>
+      <th>Rx Average</th>
+      <th>Tx Projected</th>
+      <th>Tx Average</th>
       <th></th>
     </tr>
   </thead>
 
   <tbody>
-    <% @charts.each_key do |lg_id| %>
+    <% @charts.each_key do |ig_id| %>
       <tr>
-        <td><%= @charts[lg_id]['deviceHostname'] %></td>
-        <td><%= @charts[lg_id]['bandwidth'] / 1000000000 %>Gbps</td>
-        <td><%= @charts[lg_id]['ifInOctets']['values']['projection'] %></td>
-        <td><%= @charts[lg_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
-        <td><%= @charts[lg_id]['ifOutOctets']['values']['projection'] %></td>
-        <td><%= @charts[lg_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
-        <td><%= button_to_function "Chart it!", "chartit(#{lg_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok" %></td>
+        <td><%= @charts[ig_id]['int_group_name'] %></td>
+        <td><%= @charts[ig_id]['bandwidth'] / 1000000 %>Mbps</td>
+        <td><%= @charts[ig_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
+        <td><%= @charts[ig_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
+        <td><%= @charts[ig_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
+        <td><%= @charts[ig_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
+        <td><%= button_to_function "Chart it!", "chartit(#{ig_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-xs" %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
 
 <div id="container" style="min-width: 300px; height: 360px;"></div>
 
@@ -50,6 +65,8 @@
   <b>Percentile:</b> Statistics are generated primarily by walking the measurements gathered from the devices in blocks of 100.  Percentile: controls the top X number of measurements that are taken into consideration when generating statistics.  99th = Top 1 measurements per 100 collected, 75th = Top 25 measurements per 100 collected, etc.</br>
   <b>High Watermark:</b> Controls what to consider a fully loaded link.  Range 0.001 -- 1.000 e.g. 0.40 would be 40% of bandwidth </br>
 <% end %>
+
+
 
 <script type="text/javascript" charset="utf-8">
 
@@ -69,33 +86,52 @@ var options = {
     }    
 };
 
-
-function chartit( int_id, watermark, percentile, start_epoch, end_epoch ) { 
-  var jsonURL = '<%%= frontend_get_linkgroup_chart %>' + '?lg_id=' + lg_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
+function chartit( ig_id, watermark, percentile, start_epoch, end_epoch ) { 
+  var jsonURL = '<%= frontend_get_int_group_chart_path %>' + '?ig_id=' + ig_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
   $.getJSON( jsonURL, function( json ) {
     options.series = [{
-      name: 'ifInOctets',
+      name: 'In-bps',
       data: json['ifInOctets']['points']
     },{
-      name: 'ifOutOctets',
+      name: 'Out-bps',
       data: json['ifOutOctets']['points']
     },{
-      name: 'ifInOctets-average',
+      name: 'In-bps-Average',
       data: json['ifInOctets']['stats']['average_rate']
     },{
-      name: 'ifInOctets-projection',
+      name: 'In-bps-Projection',
       data: json['ifInOctets']['stats']['projection']
     },{
-      name: 'ifOutOctets-average',
+      name: 'Out-bps-Average',
       data: json['ifOutOctets']['stats']['average_rate']
     },{
-      name: 'ifOutOctets-projection',
+      name: 'Out-bps-Projection',
       data: json['ifOutOctets']['stats']['projection']
     },{
       name: 'High Watermark',
       data: json['watermark']
     }];
     var chart = new Highcharts.Chart(options);
+    chart.series[6].hide()
   });
 }
+
+$(function () {
+    $("#watermark").slider({
+        value: <%= @post_var['watermark']%>,
+        min: 0.002,
+        max: 1.000,
+        step: 0.002,
+        slide: function (event, ui) {
+            $("#watermark_amount").val(ui.value);
+        }
+    });
+    $("#watermark_amount").val($("#watermark").slider("value"));
+});
+
+
+$("#watermark_amount").change(function () {
+    $("#watermark").slider('value', $("#watermark_amount").val());
+});
+
 </script>
