@@ -83,10 +83,6 @@ def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
       xvals << measurement['_id']
       yvals << measurement['rate'][interface][recordName]
   end
-  #puts "getRawMeasurements DEBUG"
-  #puts xvals.inspect
-  #puts yvals.inspect
-  #returns datastructure of X,Y
   return xvals, yvals
 end
 
@@ -121,13 +117,22 @@ Interface.all.each do |int|
     #foreach record to collect
     recordsToCollect.each do |recordToCollect|
       sMath = SimpacityMath.new(sliceSize)
-
       percentiles.each do |percentile|
-        #is the data in AR? TODO -- check for the other time measurement as well, delete and rebuild if one is missing
-        if int.measurements.where(:collected_at => dayIncrement0600, :percentile => percentile, :record => recordToCollect).count > 0  
+        #find existing measurements
+        ar_dayIncrement0600 = int.measurements.where(:collected_at => dayIncrement0600,
+                                                               :percentile => percentile, :record => recordToCollect)
+        ar_dayIncrement1800 = int.measurements.where(:collected_at => dayIncrement1800,
+                                                               :percentile => percentile, :record => recordToCollect)
+
+        #is the data already in AR for the day? 
+        if ((ar_dayIncrement0600.count == 1) and (ar_dayIncrement1800.count == 1))
           #do nothing
-          puts "Doing nothing, #{int.name}, #{dayIncrement0600}, #{percentile}, #{recordToCollect}"
+          puts "Doing nothing, #{int.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordToCollect}"
         else
+          #Clean up the entries if needed
+          ar_dayIncrement0600.destroy_all
+          ar_dayIncrement1800.destroy_all
+
           if not sMath.valuesLoaded
             #load the raw data for the day if not loaded already
             (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordToCollect, dayIncrementStart, dayIncrementEnd)

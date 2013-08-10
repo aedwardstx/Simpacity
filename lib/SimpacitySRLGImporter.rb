@@ -1,23 +1,11 @@
 #!/usr/bin/env ruby
 
-#import flow
-#gather a list of interfaces from active record
-#get devices from AR
-#foreach device.interface
-#  foreach day of data in the mongodb
-#    foreach recorded counter configured(RxOctets, TxOctets, etc.)
-#      foreach percentile configured
-#        determine if data is recorded in AR 
-#        if not
-#          run the calulation on the data and record it
-#        else
-#          do nothing
-#foreach interfaceGroup   -- TODO - Do this later, once the per-interface logic is complete
+#foreach interfaceGroup   
 # if the refresh flag set(i.e. interface associations were changed)
 #   delete all measurements for the interfaceGroup in AR
 # foreach day of data in the mongodb, for the set of interfaces in the group(should data for all int be mandidtory for the period?)
-#   foreach percentile configured
-#     foreach recorded counter configured(RxOctets, TxOctets, etc.)
+#   foreach recorded counter configured(RxOctets, TxOctets, etc.)
+#     foreach percentile configured
 #       determine if data is recorded in AR
 #       if not
 #         run the calulation on the data and record it
@@ -72,10 +60,6 @@ sliceSize = Setting.first.slice_size
 #   will need logic to softfail if values are not there
 recordsToCollect = ['ifInOctets','ifOutOctets']
 
-#testing parameters as AR is not yet populated
-#interfaces = {'router1' => ['Fa0/1','Fa0/0'], 'router2' => ['Fa0/1','Fa0/0']}
-
-
 @client = MongoClient.new(Setting.first.mongodb_db_hostname, Setting.first.mongodb_db_port)
 @db     = @client[Setting.first.mongodb_db_name]
 
@@ -111,7 +95,7 @@ InterfaceGroup.all.each do |int_group|
   #Find the earliest mongodb entry for the interface group
   firstEntryEpoch = Time.now.to_i 
   int_group.interfaces.each do |int|
-    puts "DEBUG -- interface=#{int},device=#{int.device.hostname}"
+    puts "DEBUG -- interface=#{int.name},device=#{int.device.hostname}"
     #find first day of data in mongo -- TODO, should not need a loop here, get rid of it
     collection = "host.#{int.device.hostname}"
 
@@ -135,6 +119,7 @@ InterfaceGroup.all.each do |int_group|
     puts " DEBUG #{dayIncrement}, #{dayIncrementStart.to_i}, #{dayIncrementEnd.to_i}"
     
     recordsToCollect.each do |recordToCollect|
+      sMath = SimpacityMath.new(sliceSize)
       percentiles.each do |percentile|
         ar_dayIncrement0600 = int_group.srlg_measurement.where(:collected_at => dayIncrement0600, 
                                                                :percentile => percentile, :record => recordToCollect) 
@@ -144,35 +129,36 @@ InterfaceGroup.all.each do |int_group|
           #do nothing
           puts "Doing nothing, #{int_group.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordToCollect}"
         else
+          puts "Starting else loop"
+
           #Clean up the entries if needed 
           ar_dayIncrement0600.destroy_all
           ar_dayIncrement1800.destroy_all
 
-          sMath = SimpacityMath.new(sliceSize)
-          int_group.interfaces.each do |int|
-            #Find a way to move these directly to their datastructures 
-            #maybe move the aggregation code to SimpacityMath, this would be easy to do then
-            puts "#{int.device.hostname},#{int.name},#{recordToCollect},#{dayIncrementStart},#{dayIncrementEnd}"
-            #TODO -- PERFORMANCE find a way to not have to copy these, maybe move getRawMeasurements to SimpacityMath 
-            (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordToCollect, dayIncrementStart, dayIncrementEnd) 
-            puts "#{arrayOfX.length}, #{arrayOfY.length}"
-            sMath.loadGroupValues(arrayOfX, arrayOfY, int.id)
+          #load the raw data for the day,int_group,recrod if not loaded already
+          if not sMath.valuesLoaded
+            int_group.interfaces.each do |int|
+              puts "Loading data from MongoDB - #{int.device.hostname},#{int.name},#{recordToCollect},#{dayIncrementStart},#{dayIncrementEnd}"
+              (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordToCollect, dayIncrementStart, dayIncrementEnd) 
+              sMath.loadGroupValues(arrayOfX, arrayOfY, int.id)
+            end
+            #aggregate all the figures -- TODO PERFORMANCE benchmark(0.16-0.25) 
+            sMath.aggregateGroupValues(window) 
           end
-          #aggregate all the figures -- TODO PERFORMANCE benchmark(0.16-0.25) 
-          sMath.aggregateGroupValues(window) 
+
           #call simacityMath
           sMath.findSIForPercentile(percentile)
           sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
           sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
           
-          puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
-          puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
           #update record in AR
+          puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
           int_group.srlg_measurement.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
+          puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
           int_group.srlg_measurement.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
-          sMath.trashEverything
         end
       end
+      sMath.trashEverything
     end
     #Increment to the next day
     dayIncrement += 86400
