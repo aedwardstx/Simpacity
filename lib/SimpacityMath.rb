@@ -199,7 +199,7 @@ class SimpacityMath
   def getYGivenX(x)
     @y=@slope*x+@intercept
     #puts "y is: #{@y}, slope is: #{@slope}, intercept is: #{@intercept}, x is: #{x}"
-    return @y
+    return @y.to_i
   end
 
   def getAverageRate

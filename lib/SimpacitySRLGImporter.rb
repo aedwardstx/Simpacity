@@ -95,30 +95,19 @@ def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
   return xvals, yvals
 end
 
-
-
-#if refresh stats is true, delete all stats for the interface group
-
-
-#wrap this in a per-record loop
-
-#create a plan, get times of first mongodb entry for all ints in int_group
-
-#walk the days from first available data add see if stats need to be generated
-  #if they do, gather the data for all ints and put it in the measurements array of hashes
-
-#run the aggregation rutine
-
-#run the SimpacityMath methods
-
-#store data to database
-
-
 yesterdayNow = Time.now-86400
 yesterdayEndOfDay = yesterdayNow.change(:hour => 23, :min=> 59, :sec => 59)
 
 
 InterfaceGroup.all.each do |int_group|
+  #if the refresh_next_import bool is true, delete all points in AR for the interface_group
+  if int_group.refresh_next_import == 1 
+    puts "Deleting all entries in AR for #{int_group.name} as refresh_next_import was set to true"
+    int_group.srlg_measurement.destroy_all  #delete_all may be faster and all thats needed
+    int_group.refresh_next_import = 0
+    int_group.save
+  end
+
   #Find the earliest mongodb entry for the interface group
   firstEntryEpoch = Time.now.to_i 
   int_group.interfaces.each do |int|
@@ -146,12 +135,19 @@ InterfaceGroup.all.each do |int_group|
     puts " DEBUG #{dayIncrement}, #{dayIncrementStart.to_i}, #{dayIncrementEnd.to_i}"
     
     recordsToCollect.each do |recordToCollect|
-
       percentiles.each do |percentile|
-        if int_group.srlg_measurement.where(:collected_at => dayIncrement0600, :percentile => percentile, :record => recordToCollect).count > 0  
+        ar_dayIncrement0600 = int_group.srlg_measurement.where(:collected_at => dayIncrement0600, 
+                                                               :percentile => percentile, :record => recordToCollect) 
+        ar_dayIncrement1800 = int_group.srlg_measurement.where(:collected_at => dayIncrement1800, 
+                                                               :percentile => percentile, :record => recordToCollect)  
+        if ((ar_dayIncrement0600.count == 1) and (ar_dayIncrement1800.count == 1))
           #do nothing
-          puts "Doing nothing, #{int.name}, #{dayIncrement0600}, #{percentile}, #{recordToCollect}"
+          puts "Doing nothing, #{int_group.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordToCollect}"
         else
+          #Clean up the entries if needed 
+          ar_dayIncrement0600.destroy_all
+          ar_dayIncrement1800.destroy_all
+
           sMath = SimpacityMath.new(sliceSize)
           int_group.interfaces.each do |int|
             #Find a way to move these directly to their datastructures 
@@ -172,13 +168,13 @@ InterfaceGroup.all.each do |int_group|
           puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
           puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
           #update record in AR
-          #int_group.srlg_measurements.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
-          #int_group.srlg_measurements.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
+          int_group.srlg_measurement.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
+          int_group.srlg_measurement.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
           sMath.trashEverything
         end
       end
-      #Increment to the next day
-      dayIncrement += 86400
     end
+    #Increment to the next day
+    dayIncrement += 86400
   end
 end
