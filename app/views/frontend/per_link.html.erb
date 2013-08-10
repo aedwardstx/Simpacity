@@ -55,7 +55,7 @@
         <td><%= @charts[int_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
         <td><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= @charts[int_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
-        <td><%= button_to_function "Chart it!", "chartit(#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-xs" %></td>
+        <td><%= button_to_function "Chart it!", "chartit('#{@charts[int_id]['deviceHostname']}','#{@charts[int_id]['interfaceName']}',#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-xs" %></td>
       </tr>
     <% end %>
   </tbody>
@@ -76,11 +76,10 @@
 var options = {
     chart: {
       renderTo: 'container',
-      defaultSeriesType: 'spline',
-      title: { text: 'asdf' },
-      xAxis: { type: 'datetime' },
-      yAxis: { title: { text: 'bps' }},
-    },
+      defaultSeriesType: 'spline'
+           },
+    xAxis: { type: 'datetime' },
+    yAxis: { title: { text: 'bps' }},
     tooltip: {
       formatter: function () {
         return Highcharts.dateFormat("%B %e %Y", this.x) + ': ' +
@@ -90,7 +89,7 @@ var options = {
 };
 
 
-function chartit( int_id, watermark, percentile, start_epoch, end_epoch ) { 
+function chartit( dev_hostname, int_name, int_id, watermark, percentile, start_epoch, end_epoch ) { 
   var jsonURL = '<%= frontend_get_perlink_chart_path %>' + '?int_id=' + int_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
   $.getJSON( jsonURL, function( json ) {
     options.series = [{
@@ -115,6 +114,7 @@ function chartit( int_id, watermark, percentile, start_epoch, end_epoch ) {
       name: 'High Watermark',
       data: json['watermark']
     }];
+    options.title = { text: dev_hostname + ":" + int_name }
     var chart = new Highcharts.Chart(options);
     chart.series[6].hide()
   });

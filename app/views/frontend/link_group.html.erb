@@ -50,7 +50,7 @@
         <td><%= @charts[ig_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
         <td><%= @charts[ig_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= @charts[ig_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
-        <td><%= button_to_function "Chart it!", "chartit(#{ig_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-xs" %></td>
+        <td><%= button_to_function "Chart it!", "chartit('#{@charts[ig_id]['int_group_name']}',#{ig_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-xs" %></td>
       </tr>
     <% end %>
   </tbody>
@@ -73,11 +73,10 @@
 var options = {
     chart: {
       renderTo: 'container',
-      defaultSeriesType: 'spline',
-      title: { text: 'asdf' },
-      xAxis: { type: 'datetime' },
-      yAxis: { title: { text: 'bps' }},
-    },
+      defaultSeriesType: 'spline'
+             },
+    xAxis: { type: 'datetime' },
+    yAxis: { title: { text: 'bps' }},
     tooltip: {
       formatter: function () {
         return Highcharts.dateFormat("%B %e %Y", this.x) + ': ' +
@@ -86,7 +85,7 @@ var options = {
     }    
 };
 
-function chartit( ig_id, watermark, percentile, start_epoch, end_epoch ) { 
+function chartit( ig_name, ig_id, watermark, percentile, start_epoch, end_epoch ) { 
   var jsonURL = '<%= frontend_get_int_group_chart_path %>' + '?ig_id=' + ig_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
   $.getJSON( jsonURL, function( json ) {
     options.series = [{
@@ -111,6 +110,7 @@ function chartit( ig_id, watermark, percentile, start_epoch, end_epoch ) {
       name: 'High Watermark',
       data: json['watermark']
     }];
+    options.title = { text: ig_name }
     var chart = new Highcharts.Chart(options);
     chart.series[6].hide()
   });
