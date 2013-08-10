@@ -1,19 +1,31 @@
 <h3>Per-Link Statistics</h3>
 
 <div class='well'>
-  <%= form_tag("/frontend/per_link", style: 'display: inline;') do %>
-    From: <%= text_field_tag 'hd_from', @post_var['hd_from'], id: 'hd_from' %>
-    To: <%= text_field_tag 'hd_to', @post_var['hd_to'], id: 'hd_to' %></br>
-    Percentile: <%= select_tag('percentile', options_for_select([['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]], selected: @post_var['percentile'] )) %> 
-    High Watermark:<%= text_field_tag 'watermark', @post_var['watermark'] %></br>
+  <%= form_tag("/frontend/per_link", class: "form-inline") do %>
+    <%= label_tag 'hd_from', 'From Date:' %>
+    <%= text_field_tag 'hd_from', @post_var['hd_from'], id: 'hd_from', class: "input-small" %>
+    <%= label_tag 'hd_to', 'To Date:' %>
+    <%= text_field_tag 'hd_to', @post_var['hd_to'], id: 'hd_to', class: "input-small" %>
+    <%= label_tag 'percentile', 'Percentile:' %>
+    <%= select_tag('percentile', options_for_select([['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]], selected: @post_var['percentile'] ), class: "input-small" ) %> 
+    <p>
+    <%= label_tag 'watermark', 'High Watermark:' %>
+    <%= text_field_tag 'watermark', @post_var['watermark'], id: 'watermark_amount', class: "input-small" %>
+    <div id="watermark" style="max-width: 200px; margin: 10px;"></div>
+    </p>
+    <table><tr>
+    <td>
     <%= submit_tag "Re-Calculate", class: "btn btn-xs" %>
+    </td>
   <% end %>
-  <%= form_tag("/frontend/per_link.xls", style: 'display: inline;') do %>
+  <%= form_tag("/frontend/per_link.xls", class: "form-inline") do %>
     <input type="hidden" name="hd_from" value="<%= @post_var['hd_from']%>">
     <input type="hidden" name="hd_to" value="<%= @post_var['hd_to']%>">
     <input type="hidden" name="percentile" value="<%= @post_var['percentile']%>">
     <input type="hidden" name="watermark" value="<%= @post_var['watermark']%>">
+    <td>
     <%= submit_tag "Export to XLS", class: "btn btn-xs" %>
+    </td></table>
   <% end %>
 </div>
 <div>
@@ -107,4 +119,27 @@ function chartit( int_id, watermark, percentile, start_epoch, end_epoch ) {
     chart.series[6].hide()
   });
 }
+
+
+$(function () {
+    $("#watermark").slider({
+        value: <%= @post_var['watermark']%>,
+        min: 0.002,
+        max: 1.000,
+        step: 0.002,
+        slide: function (event, ui) {
+            $("#watermark_amount").val(ui.value);
+        }
+    });
+    $("#watermark_amount").val($("#watermark").slider("value"));
+});
+
+
+$("#watermark_amount").change(function () {
+    $("#watermark").slider('value', $("#watermark_amount").val());
+});
+
+
+
+
 </script>
