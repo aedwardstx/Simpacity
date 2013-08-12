@@ -48,7 +48,7 @@ module FrontendHelper
         @chart[record]['points'][index] << element.to_i * 1000
         @chart[record]['points'][index] << arrayOfY[index]
       end
-      (projection,average_rate,projection_start,projection_end) = get_int_stats(int_group_id, percentile, record, start_epoch, end_epoch, watermark)
+      (projection,average_rate,projection_start,projection_end) = get_int_group_stats(int_group_id, percentile, record, start_epoch, end_epoch, watermark)
       @chart[record]['stats']['average_rate'] = [[start_epoch * 1000,average_rate],[end_epoch * 1000,average_rate]]
       @chart[record]['stats']['projection'] = [[start_epoch * 1000,projection_start],[end_epoch * 1000,projection_end]] 
       @chart['watermark'] = [[start_epoch * 1000,watermark * bandwidth],[end_epoch * 1000,watermark * bandwidth]] 
@@ -105,13 +105,6 @@ module FrontendHelper
     return projection, average_rate, projection_start, projection_end
   end
 
-  def get_int_group_bandwidth(int_group_id)
-    interface_group = InterfaceGroup.find(int_group_id)
-    bandwidth = 0
-    interface_group.interfaces.each { |int| bandwidth += int.bandwidth }
-    return bandwidth
-  end
-
   def get_int_group_stats(int_group_id, percentile, record, start_epoch, end_epoch, watermark)
     (arrayOfX, arrayOfY) =  get_int_group_measurements(int_group_id, percentile, record, start_epoch, end_epoch)
     calc = SimpacityMath.new(1)
@@ -128,6 +121,13 @@ module FrontendHelper
     end
 
     return projection, average_rate, projection_start, projection_end
+  end
+
+  def get_int_group_bandwidth(int_group_id)
+    interface_group = InterfaceGroup.find(int_group_id)
+    bandwidth = 0
+    interface_group.interfaces.each { |int| bandwidth += int.bandwidth }
+    return bandwidth
   end
 
   def get_all_int_data(start_epoch,end_epoch,watermark,percentile)

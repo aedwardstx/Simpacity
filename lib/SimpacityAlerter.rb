@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
+#Flow
+#walk the configured alerts and email the contact group associated if needed
+#
+
+
 require 'rubygems'
 require 'mongo'
 include Mongo
