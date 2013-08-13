@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  enabled: false
+  name_regex: MyString
+  description_regex: MyString
+  link_type_id: 1
+
+two:
+  enabled: false
+  name_regex: MyString
+  description_regex: MyString
+  link_type_id: 1

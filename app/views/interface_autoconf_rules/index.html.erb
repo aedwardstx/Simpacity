@@ -1,0 +1,36 @@
+<h3>Interface Auto-Configuration Rules</h3>
+
+<table id='dt_interface_autoconf'>
+  <thead>
+    <tr>
+      <th>Enabled</th>
+      <th>Name Regex</th>
+      <th>Description Regex</th>
+      <th>Link Type</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @interface_autoconf_rules.each do |interface_autoconf_rule| %>
+      <tr>
+        <td><%= interface_autoconf_rule.enabled %></td>
+        <td><%= interface_autoconf_rule.name_regex %></td>
+        <td><%= interface_autoconf_rule.description_regex %></td>
+        <td><%= interface_autoconf_rule.link_type.name %></td>
+        <td><%= link_to 'Edit', edit_interface_autoconf_rule_path(interface_autoconf_rule), :class => 'btn btn-mini'  %></td>
+        <td><%= link_to 'Destroy', interface_autoconf_rule, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger'  %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Interface Autoconf Rule', new_interface_autoconf_rule_path, :class => 'btn btn-mini'  %>
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  </br>
+<% end %>

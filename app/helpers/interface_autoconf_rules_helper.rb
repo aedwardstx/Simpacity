@@ -1,0 +1,2 @@
+module InterfaceAutoconfRulesHelper
+end

@@ -1,0 +1,34 @@
+<h3>Device Auto-Configuration Rules</h3>
+
+<table id='dt_device_autoconf'>
+  <thead>
+    <tr>
+      <th>Enabled</th>
+      <th>Network</th>
+      <th>Hostname regex</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @device_autoconf_rules.each do |device_autoconf_rule| %>
+      <tr>
+        <td><%= device_autoconf_rule.enabled %></td>
+        <td><%= device_autoconf_rule.network %></td>
+        <td><%= device_autoconf_rule.hostname_regex %></td>
+        <td><%= link_to 'Edit', edit_device_autoconf_rule_path(device_autoconf_rule), :class => 'btn btn-mini' %></td>
+        <td><%= link_to 'Destroy', device_autoconf_rule, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Device Autoconf Rule', new_device_autoconf_rule_path, :class => 'btn btn-mini' %>
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  </br>
+<% end %>

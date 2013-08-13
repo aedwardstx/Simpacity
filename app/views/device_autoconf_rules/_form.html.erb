@@ -1,0 +1,29 @@
+<%= form_for(@device_autoconf_rule) do |f| %>
+  <% if @device_autoconf_rule.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@device_autoconf_rule.errors.count, "error") %> prohibited this device_autoconf_rule from being saved:</h2>
+
+      <ul>
+      <% @device_autoconf_rule.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :enabled %>
+    <%= f.check_box :enabled %>
+  </div>
+  <div class="field">
+    <%= f.label :network %>
+    <%= f.text_field :network %>
+  </div>
+  <div class="field">
+    <%= f.label :hostname_regex %>
+    <%= f.text_field :hostname_regex %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

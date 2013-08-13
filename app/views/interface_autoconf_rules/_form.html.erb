@@ -1,0 +1,35 @@
+<div class='well'>
+  <%= form_for(@interface_autoconf_rule) do |f| %>
+    <% if @interface_autoconf_rule.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@interface_autoconf_rule.errors.count, "error") %> prohibited this interface_autoconf_rule from being saved:</h2>
+
+        <ul>
+        <% @interface_autoconf_rule.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :enabled %>
+      <%= f.check_box :enabled %>
+    </div>
+    <div class="field">
+      <%= f.label :name_regex %>
+      <%= f.text_field :name_regex %>
+    </div>
+    <div class="field">
+      <%= f.label :description_regex %>
+      <%= f.text_field :description_regex %>
+    </div>
+    <div class="field">
+      <%= f.label 'Resulting Link Type' %>
+      <%= f.select :link_type_id, LinkType.all.collect {|link_type| [ link_type.name, link_type.id]} %>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,2 @@
+module DeviceAutoconfRulesHelper
+end
