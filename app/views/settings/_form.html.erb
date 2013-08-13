@@ -76,6 +76,14 @@
       <%= f.label :mailhost %>
       <%= f.text_field :mailhost %>
     </div>
+    <div class="field">
+      <%= f.label :max_trending_future_days %>
+      <%= f.number_field :max_trending_future_days %>
+    </div>
+    <div class="field">
+      <%= f.label :polling_interval_secs %>
+      <%= f.number_field :polling_interval_secs %>
+    </div>
 
     <div class="actions">
       <%= f.submit %>

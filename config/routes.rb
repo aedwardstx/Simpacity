@@ -1,8 +1,6 @@
 Simpacity::Application.routes.draw do
   resources :interface_autoconf_rules
-
   resources :device_autoconf_rules
-
   resources :alerts
   resources :contact_groups
   resources :link_types

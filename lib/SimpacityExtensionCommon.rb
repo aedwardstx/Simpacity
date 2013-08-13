@@ -1,21 +1,9 @@
 #!/usr/bin/env ruby
 
-#Flow
+#This script is to be called by the various Simpacity helper scripts
 #
-#Description and Bandwidth Updating
-# Crawl Zpollers targets collection to update the interface descriptions and speeds
-#
-#Unconfigured Percentiles Handling
-# delete measurements that are using unconfigured percentiles
-#   Will need to configure percentiles in AR for this, WAIT for percentile revamp
-#
-#
-#
-
 
 require 'rubygems'
-require 'mongo'
-include Mongo
 gem 'activerecord'
 require 'active_record'
 
@@ -36,10 +24,14 @@ require "#{simpacity_base}/app/models/measurement.rb"
 require "#{simpacity_base}/app/models/device.rb"
 require "#{simpacity_base}/app/models/snmp.rb"
 require "#{simpacity_base}/app/models/setting.rb"
+require "#{simpacity_base}/app/models/alert.rb"
+require "#{simpacity_base}/app/models/contact_group.rb"
+require "#{simpacity_base}/app/models/device_autoconf_rule.rb"
+require "#{simpacity_base}/app/models/interface_autoconf_rule.rb"
+require "#{simpacity_base}/app/models/link_type.rb"
 
 
-#Slice Size controls how many contiguous measurements are examined at a time,
-#also affects percentile calculation, think hard before you change this to something other than 100.
-sliceSize = Setting.first.slice_size
-
+#Require some helpers
+#require "#{simpacity_base}/app/helpers/frontend_helper.rb"
+#require "#{simpacity_base}/app/helpers/alerts_helper.rb"
 

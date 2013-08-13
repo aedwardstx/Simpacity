@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130812190733) do
+ActiveRecord::Schema.define(version: 20130813172414) do
 
   create_table "alerts", force: true do |t|
     t.boolean  "enabled"
@@ -119,6 +119,8 @@ ActiveRecord::Schema.define(version: 20130812190733) do
     t.integer  "link_group_importer_lookback_window"
     t.integer  "zpoller_poller_interval"
     t.string   "mailhost"
+    t.integer  "polling_interval_secs"
+    t.integer  "max_trending_future_days"
   end
 
   create_table "snmps", force: true do |t|

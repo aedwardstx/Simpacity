@@ -92,7 +92,7 @@ module FrontendHelper
     if calc.loadValues(arrayOfX, arrayOfY)
       interface = Interface.find(int_id)
       bandwidth = interface.bandwidth
-      projection = calc.projectDepletion(watermark, bandwidth, percentile, (86400 * 180))
+      projection = calc.projectDepletion(watermark, bandwidth, percentile, (86400 * Setting.first.max_trending_future_days))
       projection = (projection - (Time.now.to_i)) / 86400 
       average_rate = calc.getAverageRate
       projection_start = calc.getYGivenX(start_epoch) 
@@ -110,7 +110,7 @@ module FrontendHelper
     calc = SimpacityMath.new(1)
     if calc.loadValues(arrayOfX, arrayOfY)
       bandwidth = get_int_group_bandwidth(int_group_id)
-      projection = calc.projectDepletion(watermark, bandwidth, percentile, (86400 * 180))
+      projection = calc.projectDepletion(watermark, bandwidth, percentile, (86400 * Setting.first.max_trending_future_days))
       projection = (projection - (Time.now.to_i)) / 86400 
       average_rate = calc.getAverageRate
       projection_start = calc.getYGivenX(start_epoch) 

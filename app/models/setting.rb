@@ -13,5 +13,7 @@ class Setting < ActiveRecord::Base
   validates_presence_of :mongodb_db_hostname
   validates_presence_of :mongodb_db_port
   validates_presence_of :mongodb_db_name
+  validates_presence_of :max_trending_future_days
+  validates_presence_of :polling_interval_secs
 
 end
