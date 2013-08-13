@@ -29,6 +29,13 @@
                   <li class="<%= 'active' if params[:controller] == 'contact_groups' %>"><%= link_to "Contact Groups", contact_groups_path %></li>
                 </ul>
               </li>
+            <li class="dropdown <%= 'active' if params[:controller] =~ /\A(?:interface_autoconf_rules|device_autoconf_rules)\z/ %>">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Auto-Configuration<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li class="<%= 'active' if params[:controller] == 'device_autoconf_rules' %>"><%= link_to "Device Auto-Config", device_autoconf_rules_path %></li>
+                  <li class="<%= 'active' if params[:controller] == 'interface_autoconf_rules' %>"><%= link_to "Interface Auto-Config", interface_autoconf_rules_path %></li>
+                </ul>
+              </li>
             <li class="dropdown <%= 'active' if params[:controller] =~ /\A(?:devices|interfaces|interface_groups|snmps|link_types|settings)\z/ %> ">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings<b class="caret"></b></a>
               <ul class="dropdown-menu">

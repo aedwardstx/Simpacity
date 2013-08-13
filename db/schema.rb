@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130807161814) do
+ActiveRecord::Schema.define(version: 20130812190733) do
 
   create_table "alerts", force: true do |t|
     t.boolean  "enabled"
@@ -37,12 +37,29 @@ ActiveRecord::Schema.define(version: 20130807161814) do
     t.datetime "updated_at"
   end
 
+  create_table "device_autoconf_rules", force: true do |t|
+    t.boolean  "enabled"
+    t.string   "network"
+    t.string   "hostname_regex"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "devices", force: true do |t|
     t.string   "description"
     t.string   "hostname"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "snmp_id"
+  end
+
+  create_table "interface_autoconf_rules", force: true do |t|
+    t.boolean  "enabled"
+    t.string   "name_regex"
+    t.string   "description_regex"
+    t.integer  "link_type_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "interface_group_relationships", force: true do |t|
