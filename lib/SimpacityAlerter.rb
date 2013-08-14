@@ -18,7 +18,12 @@ require 'active_record'
 simpacity_base = '/root/projects/simpacity'
 
 require "#{simpacity_base}/lib/SimpacityExtensionCommon.rb"
-require "#{simpacity_base}/lib/SimpacityAlerterFunctions.rb"
+#require "#{simpacity_base}/lib/SimpacityAlerterFunctions.rb"
+
+require "#{simpacity_base}/app/helpers/frontend_helper.rb"
+require "#{simpacity_base}/app/helpers/alerts_helper.rb"
+include FrontendHelper
+include AlertsHelper
 
 
 #Slice Size controls how many contiguous measurements are examined at a time,

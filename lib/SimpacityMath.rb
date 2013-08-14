@@ -204,8 +204,8 @@ class SimpacityMath
       tb_exceeded = false
       tb_exceeded = true if (getYGivenX(lastSampleTime) >= targetBandwidth)
 
-      puts "Debug watermark=#{watermark},bandwidth=#{bandwidth},percentile=#{percentile},slope=#{@slope},intercept=#{@intercept},tb_exceeded=#{tb_exceeded}"
-      puts "Debug maxProjectedTimeDistance=#{maxProjectedTimeDistance},targetBandwidth=#{targetBandwidth},maxProjectedTimeDistance=#{maxProjectedTimeDistance},time=#{time}"
+      #puts "Debug watermark=#{watermark},bandwidth=#{bandwidth},percentile=#{percentile},slope=#{@slope},intercept=#{@intercept},tb_exceeded=#{tb_exceeded}"
+      #puts "Debug maxProjectedTimeDistance=#{maxProjectedTimeDistance},targetBandwidth=#{targetBandwidth},maxProjectedTimeDistance=#{maxProjectedTimeDistance},time=#{time}"
       
       #The link is not already exceeded will be exhausted sometime between now and maxProjectedTimeDistance
       if (tb_exceeded == false and time >= lastSampleTime and time <= maxProjectedTimeDistance)   #time is beween 0 and maxProjectedTimeDistance
