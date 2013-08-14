@@ -12,9 +12,13 @@ require 'mongo'
 include Mongo
 gem 'activerecord'
 require 'active_record'
-require '/root/projects/simpacity/lib/SimpacityExtensionCommon.rb'
 
-require '/root/projects/simpacity/lib/SimpacityAlerterFunctions.rb'
+
+#CHANGE ME TO FIT YOUR ENVIRONMENT!!
+simpacity_base = '/root/projects/simpacity'
+
+require "#{simpacity_base}/lib/SimpacityExtensionCommon.rb"
+require "#{simpacity_base}/lib/SimpacityAlerterFunctions.rb"
 
 
 #Slice Size controls how many contiguous measurements are examined at a time,

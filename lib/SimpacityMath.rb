@@ -194,24 +194,31 @@ class SimpacityMath
 
     #given bandwidth of y and highWatermark, find X value for depletion
     if self.valuesLoaded
-      targetBandwidth=bandwidth*watermark
+      targetBandwidth=(bandwidth*watermark).to_i
       self.findSIForPercentile(percentile)
-      time=(targetBandwidth-@intercept)/@slope
+      time=((targetBandwidth-@intercept)/@slope).to_i
       lastSampleTime=@xvals.sort[-1]
       maxProjectedTimeDistance+=lastSampleTime
       
-      #puts "Debug watermark=#{watermark},bandwidth=#{bandwidth},percentile=#{percentile},slope=#{@slope},intercept=#{@intercept}"
-      #puts "Debug maxProjectedTimeDistance=#{maxProjectedTimeDistance},targetBandwidth=#{targetBandwidth},maxProjectedTimeDistance=#{maxProjectedTimeDistance},time=#{time}"
+      #Find out if the bandwidth has already been exceeded
+      tb_exceeded = false
+      tb_exceeded = true if (getYGivenX(lastSampleTime) >= targetBandwidth)
+
+      puts "Debug watermark=#{watermark},bandwidth=#{bandwidth},percentile=#{percentile},slope=#{@slope},intercept=#{@intercept},tb_exceeded=#{tb_exceeded}"
+      puts "Debug maxProjectedTimeDistance=#{maxProjectedTimeDistance},targetBandwidth=#{targetBandwidth},maxProjectedTimeDistance=#{maxProjectedTimeDistance},time=#{time}"
       
-      if ((time>=lastSampleTime) and (time<=maxProjectedTimeDistance))   #time is beween 0 and maxProjectedTimeDistance
+      #The link is not already exceeded will be exhausted sometime between now and maxProjectedTimeDistance
+      if (tb_exceeded == false and time >= lastSampleTime and time <= maxProjectedTimeDistance)   #time is beween 0 and maxProjectedTimeDistance
         timeProjection = time
-        #puts "Debug 1st condition"
-      elsif (time>maxProjectedTimeDistance)   #time is more than maxProjectedTimeDistance, truncate to maxProjectedTimeDistance
+
+      #The link is not already exhausted and the projected exhaustion is before lastSampleTime(- slope) or beyound maxProjectedTimeDistance(+ slope)
+      elsif ( tb_exceeded == false and (time < lastSampleTime or time > maxProjectedTimeDistance))  
         timeProjection = maxProjectedTimeDistance
-        #puts "Debug 2nd condition"
-      elsif (time<lastSampleTime)    #time is less than the lastSampleTime, i.e. we have already exhausted the link
+
+      #The link has already been exhausted -- set the timeProjection to lastSampleTime
+      elsif ( tb_exceeded == true )   
         timeProjection = lastSampleTime
-        #puts "Debug 3rd condition"
+
       else
         abort "Not sure what happened, this is impossible"
       end
