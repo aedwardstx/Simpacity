@@ -28,7 +28,7 @@ gem 'highcharts-rails'
 gem 'twitter-bootstrap-rails'
 
 require 'mongo'
-require '/root/projects/SimpacityMath'
+require '/opt/simpacity-dev/lib/SimpacityMath'
 
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes

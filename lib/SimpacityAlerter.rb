@@ -15,10 +15,9 @@ require 'active_record'
 
 
 #CHANGE ME TO FIT YOUR ENVIRONMENT!!
-simpacity_base = '/root/projects/simpacity'
+simpacity_base = '/opt/simpacity-dev'
 
 require "#{simpacity_base}/lib/SimpacityExtensionCommon.rb"
-#require "#{simpacity_base}/lib/SimpacityAlerterFunctions.rb"
 
 require "#{simpacity_base}/app/helpers/frontend_helper.rb"
 require "#{simpacity_base}/app/helpers/alerts_helper.rb"

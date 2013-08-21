@@ -19,12 +19,11 @@ require 'mongo'
 require 'pp'
 include Mongo
 gem 'activerecord'
-#require 'sqlite3'
 require 'active_record'
 require 'benchmark'
 
 #CHANGE ME TO FIT YOUR ENVIRONMENT!!
-simpacity_base = '/root/projects/simpacity'
+simpacity_base = '/opt/simpacity-dev'
 
 require "#{simpacity_base}/lib/SimpacityExtensionCommon.rb"
 

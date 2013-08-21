@@ -8,7 +8,7 @@ gem 'activerecord'
 require 'active_record'
 
 #CHANGE ME TO FIT YOUR ENVIRONMENT!!
-simpacity_base = '/root/projects/simpacity'
+simpacity_base = '/opt/simpacity-dev'
 require "#{simpacity_base}/lib/SimpacityMath"
 
 ActiveRecord::Base.establish_connection(
