@@ -5,3 +5,44 @@ A successful installation of calmh's zpoller with packages.yml(must collect ifIn
   
 MongoDB, Ruby >1.9.3, Node.js
 
+
+
+#Simpacity Installation
+
+#Install required Debian packages
+sudo apt-get install build-essential sysstat snmp mongodb git-core curl build-essential openssl libssl-dev ruby1.9.1-dev
+
+#Install Zpoller   ---  Need to add this
+
+
+#Install nodejs  
+git clone https://github.com/joyent/node.git
+cd node
+
+# 'git tag' shows all available versions: select the latest stable.
+git checkout v0.10.16
+ 
+# Configure seems not to find libssl by default so we give it an explicit pointer.
+# Optionally: you can isolate node by adding --prefix=/opt/node
+./configure --openssl-libpath=/usr/lib/ssl
+make
+make test
+sudo make install
+
+
+
+#Install Rails and setup Simpacity
+sudo gem1.9.1 install rails
+sudo gem install mongo
+sudo gem install bson_ext
+
+change path for SimpactiyMath in Gemfile
+change path for simpacity_base in all ./lib/Simpacity.* files
+  
+bundle
+bundle install
+
+./bin/rake db:migrate
+./bin/rake db:seed
+
+
