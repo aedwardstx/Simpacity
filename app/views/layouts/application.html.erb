@@ -46,6 +46,8 @@
                 <li class="<%= 'active' if params[:controller] == 'link_types' %>"><%= link_to "Link Type Settings", link_types_path %></li>
                 <li class="<%= 'active' if params[:controller] == 'settings' %>"><%= link_to "General Settings", settings_path %></li>
               </ul>
+             </li>
+            <li><% if user_signed_in? %> Signed in as <%= current_user.login %>. Not you? <%= link_to "Sign out", destroy_user_session_path, :method => :delete %><% end %>
             </li>
           </ul>
         </div>
@@ -55,7 +57,9 @@
 
   <div class="container">
     <div class="row">
-      <div class="span9"><%= yield %></div>
+      <div class="span9">
+        <%= yield %>
+      </div>
       <div class="span3"><%= yield :sidebar %></div>
     </div>
   </div>

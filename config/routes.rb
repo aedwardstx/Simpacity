@@ -1,4 +1,5 @@
 Simpacity::Application.routes.draw do
+  devise_for :users
   resources :interface_autoconf_rules
   resources :device_autoconf_rules
   resources :alerts

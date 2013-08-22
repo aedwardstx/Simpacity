@@ -27,6 +27,8 @@ gem 'less-rails'
 gem 'therubyracer'
 gem 'highcharts-rails'
 gem 'twitter-bootstrap-rails'
+gem 'devise'
+gem 'devise_ldap_authenticatable'
 
 require 'mongo'
 require '/opt/simpacity-dev/lib/SimpacityMath'

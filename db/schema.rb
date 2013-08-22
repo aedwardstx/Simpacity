@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130813172414) do
+ActiveRecord::Schema.define(version: 20130822155237) do
 
   create_table "alerts", force: true do |t|
     t.boolean  "enabled"
@@ -154,5 +154,19 @@ ActiveRecord::Schema.define(version: 20130813172414) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "users", force: true do |t|
+    t.string   "login",               default: "", null: false
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",       default: 0
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "users", ["login"], name: "index_users_on_login", unique: true, using: :btree
 
 end
