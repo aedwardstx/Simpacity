@@ -8,15 +8,15 @@
 
 
 Setting.delete_all
-Setting.create  :slice_size => '100', 
-                :default_percentile => '5', 
-                :default_watermark => '0.40', 
-                :max_hist_dist => '180', 
-                :default_hist_dist => '30', 
+Setting.create  :slice_size => 100, 
+                :default_percentile => 5, 
+                :default_watermark => 0.40, 
+                :max_hist_dist => 180, 
+                :default_hist_dist => 30, 
                 :zpoller_rc_location => '/etc/init.d/zpoller', 
                 :zconfig_location => '/usr/local/lib/node_modules/zpoller/bin/zconfig', 
                 :zpoller_hosts_location => '/usr/local/lib/node_modules/zpoller/conf/hosts.csv',
-                :mongodb_test_window => '600', 
+                :mongodb_test_window => 600, 
                 :zpoller_base_dir => '/usr/local/lib/node_modules/zpoller',
                 :link_group_importer_lookback_window => 15, 
                 :zpoller_poller_interval => 15, 

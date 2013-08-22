@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130822155237) do
+ActiveRecord::Schema.define(version: 20130822204953) do
 
   create_table "alerts", force: true do |t|
     t.boolean  "enabled"
@@ -81,11 +81,11 @@ ActiveRecord::Schema.define(version: 20130822155237) do
     t.integer  "device_id"
     t.string   "description"
     t.string   "name"
-    t.integer  "bandwidth"
     t.string   "zenossLink"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "link_type_id"
+    t.integer  "bandwidth",    limit: 8
   end
 
   create_table "link_types", force: true do |t|

@@ -17,8 +17,8 @@ class Device < ActiveRecord::Base
 
   #before_save :default_values
 
-  after_save :update_zpoller, on: [:create, :update]
-  after_destroy :update_zpoller
+  #after_save :update_zpoller, on: [:create, :update]
+  #after_destroy :update_zpoller
 
 
   #validate :hostname_resolvable, on: :create

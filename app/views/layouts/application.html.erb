@@ -47,7 +47,7 @@
                 <li class="<%= 'active' if params[:controller] == 'settings' %>"><%= link_to "General Settings", settings_path %></li>
               </ul>
              </li>
-            <li><% if user_signed_in? %> Signed in as <%= current_user.login %>. Not you? <%= link_to "Sign out", destroy_user_session_path, :method => :delete %><% end %>
+             <li><p><% if user_signed_in? %>Signed in as <%= current_user.login %>. <a data-method="delete" href="/users/sign_out" rel="nofollow">Sign out</a></p><% end %>
             </li>
           </ul>
         </div>

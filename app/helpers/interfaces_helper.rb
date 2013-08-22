@@ -12,7 +12,7 @@ module InterfacesHelper
         if meta_for_int['name'] == interface.name
           description = meta_for_int['metadata']['description']
           bandwidth = meta_for_int['metadata']['ifSpeed']
-          bandwidth = meta_for_int['metadata']['ifHighSpeed'] * 1000000  if bandwidth = 4294967295 #bandwidth is too high for ifSpeed, need to use ifHighSpeed
+          bandwidth = meta_for_int['metadata']['ifHighSpeed'] * 1000000  if bandwidth == 4294967295 #bandwidth is too high for ifSpeed, need to use ifHighSpeed
           mtu =  meta_for_int['metadata']['mtu']
         end
       end

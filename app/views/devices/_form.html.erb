@@ -22,7 +22,7 @@
     </div>
     <div class="field">
       <%= f.label :snmp %>
-      <%= f.select :snmp_id, Snmp.all.collect {|snmp| [ snmp.community_string, snmp.id]}%>
+      <%= f.select :snmp_id, Snmp.all.collect {|snmp| [ snmp.name, snmp.id]}%>
     </div>
 
     <div class="actions">

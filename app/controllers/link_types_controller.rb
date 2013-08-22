@@ -7,8 +7,8 @@ class LinkTypesController < ApplicationController
   end
 
   # GET /link_types/1
-  def show
-  end
+  #def show
+  #end
 
   # GET /link_types/new
   def new
@@ -25,7 +25,7 @@ class LinkTypesController < ApplicationController
 
     respond_to do |format|
       if @link_type.save
-        format.html { redirect_to @link_type, notice: 'Link type was successfully created.' }
+        format.html { redirect_to link_types_url, notice: 'Link type was successfully created.' }
       else
         format.html { render action: 'new' }
       end
@@ -36,7 +36,7 @@ class LinkTypesController < ApplicationController
   def update
     respond_to do |format|
       if @link_type.update(link_type_params)
-        format.html { redirect_to @link_type, notice: 'Link type was successfully updated.' }
+        format.html { redirect_to link_types_url, notice: 'Link type was successfully updated.' }
       else
         format.html { render action: 'edit' }
       end
