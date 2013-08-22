@@ -24,7 +24,8 @@ module InterfaceBulksHelper
       meta_for_host['interfaces'].each do |meta_for_int|
         if meta_for_int['name'] == int_name
           description = meta_for_int['metadata']['description']
-          bandwidth = meta_for_int['metadata']['speed']
+          bandwidth = meta_for_int['metadata']['ifSpeed']
+          bandwidth = meta_for_int['metadata']['ifHighSpeed'] * 1000000  if bandwidth = 4294967295 #bandwidth is too high for ifSpeed, need to use ifHighSpeed
           mtu =  meta_for_int['metadata']['mtu']
         end
       end

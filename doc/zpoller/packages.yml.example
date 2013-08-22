@@ -36,14 +36,15 @@
       table: ifOutOctets
 
   # Define which interval to collect values at.
-  interval: 15
+  interval: 20
 
   # Collect these metadata fields for each interface. They are not used by the
   # poller but can be shown for informational purposes.
-  metadata: 
+  metadata:
     mtu: .1.3.6.1.2.1.2.2.1.4
     description: .1.3.6.1.2.1.31.1.1.1.18
-    speed: .1.3.6.1.2.1.2.2.1.5
+    ifSpeed: .1.3.6.1.2.1.2.2.1.5
+    ifHighSpeed: 1.3.6.1.2.1.31.1.1.1.15
 
   # Define graphs. Not used by the poller, but used by the HTTP server.
   graphs: []

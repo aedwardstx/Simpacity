@@ -1,0 +1,3 @@
+10 0 * * * root bash /opt/simpacity-dev/lib/SimpacityImporter.rb >> /opt/simpacity-dev/log/SimpacityImporter.log
+10 3 * * * root bash /opt/simpacity-dev/lib/SimpacitySRLGImporter.rb >> /opt/simpacity-dev/log/SimpacitySRLGImporter.log
+10 0 * * * root bash /opt/simpacity-dev/lib/SimpacityOddjob.rb >> /opt/simpacity-dev/log/SimpacityOddjob.log

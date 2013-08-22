@@ -35,7 +35,9 @@ sliceSize = Setting.first.slice_size
 #Move this definition to AR on a per-interface basis in the future
 # This will do a best effort to grab these values from Mongo
 #   will need logic to softfail if values are not there
-recordsToCollect = ['ifInOctets','ifOutOctets']
+#recordsToCollect = ['ifInOctets','ifOutOctets']
+#Provides a mapping for common name to the shorthand name used in the DB
+recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
 
 #testing parameters as AR is not yet populated
 #interfaces = {'router1' => ['Fa0/1','Fa0/0'], 'router2' => ['Fa0/1','Fa0/0']}
@@ -87,19 +89,19 @@ Interface.all.each do |int|
     puts " DEBUG #{dayIncrement}, #{dayIncrementStart.to_i}, #{dayIncrementEnd.to_i}"
 
     #foreach record to collect
-    recordsToCollect.each do |recordToCollect|
+    recordsToCollect.each do |recordName,recordShortName|
       sMath = SimpacityMath.new(sliceSize)
       percentiles.each do |percentile|
         #find existing measurements
         ar_dayIncrement0600 = int.measurements.where(:collected_at => dayIncrement0600,
-                                                               :percentile => percentile, :record => recordToCollect)
+                                                               :percentile => percentile, :record => recordName)
         ar_dayIncrement1800 = int.measurements.where(:collected_at => dayIncrement1800,
-                                                               :percentile => percentile, :record => recordToCollect)
+                                                               :percentile => percentile, :record => recordName)
 
         #is the data already in AR for the day? 
         if ((ar_dayIncrement0600.count == 1) and (ar_dayIncrement1800.count == 1))
           #do nothing
-          puts "Doing nothing, #{int.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordToCollect}"
+          puts "Doing nothing, #{int.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordName}"
         else
           #Clean up the entries if needed
           ar_dayIncrement0600.destroy_all
@@ -107,7 +109,7 @@ Interface.all.each do |int|
 
           if not sMath.valuesLoaded
             #load the raw data for the day if not loaded already
-            (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordToCollect, dayIncrementStart, dayIncrementEnd)
+            (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordShortName, dayIncrementStart, dayIncrementEnd)
             #puts "Debug"
             #puts arrayOfX.inspect
             #puts arrayOfY.inspect
@@ -118,12 +120,12 @@ Interface.all.each do |int|
           sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
           sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
           
-          puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
-          puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
+          puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
+          puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
 
           #update record in AR
-          int.measurements.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
-          int.measurements.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
+          int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
+          int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
         end
         #unload findings from SimpacityMath
         sMath.trashFindings

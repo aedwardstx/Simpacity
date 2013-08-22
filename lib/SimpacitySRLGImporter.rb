@@ -43,7 +43,9 @@ sliceSize = Setting.first.slice_size
 #Move this definition to AR on a per-interface basis in the future
 # This will do a best effort to grab these values from Mongo
 #   will need logic to softfail if values are not there
-recordsToCollect = ['ifInOctets','ifOutOctets']
+#recordsToCollect = ['ifInOctets','ifOutOctets']
+#Provides a mapping for common name to the shorthand name used in the DB
+recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
 
 @client = MongoClient.new(Setting.first.mongodb_db_hostname, Setting.first.mongodb_db_port)
 @db     = @client[Setting.first.mongodb_db_name]
@@ -103,16 +105,16 @@ InterfaceGroup.all.each do |int_group|
     dayIncrementEnd = dayIncrement.change(:hour => 23, :min => 59, :sec => 59)
     puts " DEBUG #{dayIncrement}, #{dayIncrementStart.to_i}, #{dayIncrementEnd.to_i}"
     
-    recordsToCollect.each do |recordToCollect|
+    recordsToCollect.each do |recordName, recordShortName|
       sMath = SimpacityMath.new(sliceSize)
       percentiles.each do |percentile|
         ar_dayIncrement0600 = int_group.srlg_measurement.where(:collected_at => dayIncrement0600, 
-                                                               :percentile => percentile, :record => recordToCollect) 
+                                                               :percentile => percentile, :record => recordName) 
         ar_dayIncrement1800 = int_group.srlg_measurement.where(:collected_at => dayIncrement1800, 
-                                                               :percentile => percentile, :record => recordToCollect)  
+                                                               :percentile => percentile, :record => recordName)  
         if ((ar_dayIncrement0600.count == 1) and (ar_dayIncrement1800.count == 1))
           #do nothing
-          puts "Doing nothing, #{int_group.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordToCollect}"
+          puts "Doing nothing, #{int_group.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordName}"
         else
           puts "Starting else loop"
 
@@ -123,8 +125,8 @@ InterfaceGroup.all.each do |int_group|
           #load the raw data for the day,int_group,recrod if not loaded already
           if not sMath.valuesLoaded
             int_group.interfaces.each do |int|
-              puts "Loading data from MongoDB - #{int.device.hostname},#{int.name},#{recordToCollect},#{dayIncrementStart},#{dayIncrementEnd}"
-              (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordToCollect, dayIncrementStart, dayIncrementEnd) 
+              puts "Loading data from MongoDB - #{int.device.hostname},#{int.name},#{recordName},#{dayIncrementStart},#{dayIncrementEnd}"
+              (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordShortName, dayIncrementStart, dayIncrementEnd) 
               sMath.loadGroupValues(arrayOfX, arrayOfY, int.id)
             end
             #aggregate all the figures -- TODO PERFORMANCE benchmark(0.16-0.25) 
@@ -137,10 +139,10 @@ InterfaceGroup.all.each do |int_group|
           sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
           
           #update record in AR
-          puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
-          int_group.srlg_measurement.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
-          puts "Debug -- insert into AR - record=#{recordToCollect},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
-          int_group.srlg_measurement.create(:record => recordToCollect, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
+          puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
+          int_group.srlg_measurement.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
+          puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
+          int_group.srlg_measurement.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
         end
       end
       sMath.trashEverything

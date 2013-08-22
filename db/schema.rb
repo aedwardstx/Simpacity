@@ -69,8 +69,13 @@ ActiveRecord::Schema.define(version: 20130813172414) do
     t.datetime "updated_at"
   end
 
-# Could not dump table "interface_groups" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "interface_groups", force: true do |t|
+    t.string   "description"
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "refresh_next_import"
+  end
 
   create_table "interfaces", force: true do |t|
     t.integer  "device_id"
