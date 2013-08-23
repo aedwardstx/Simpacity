@@ -55,7 +55,7 @@
         <td><%= @charts[int_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
         <td><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= @charts[int_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
-        <td><%= button_to_function "Chart it!", "chartit('#{@charts[int_id]['deviceHostname']}','#{@charts[int_id]['interfaceName']}',#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-xs" %></td>
+        <td><%= button_to_function "Chart it!", "chartit('#{@charts[int_id]['deviceHostname']}','#{@charts[int_id]['interfaceName']}',#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-mini" %></td>
       </tr>
     <% end %>
   </tbody>
