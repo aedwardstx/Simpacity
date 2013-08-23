@@ -17,7 +17,6 @@
 //= require highcharts/highcharts-more
 //= require twitter/bootstrap
 //= require dataTables/jquery.dataTables
-//= require dataTables/extras/TableTools
 //= require dataTables/jquery.dataTables.bootstrap
 //= require_tree .
 $(function() {
