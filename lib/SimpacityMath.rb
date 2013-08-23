@@ -196,9 +196,14 @@ class SimpacityMath
     if self.valuesLoaded
       targetBandwidth=(bandwidth*watermark).to_i
       self.findSIForPercentile(percentile)
-      time=((targetBandwidth-@intercept)/@slope).to_i
       lastSampleTime=@xvals.sort[-1]
       maxProjectedTimeDistance+=lastSampleTime
+      #if the slope is 0, set to maxProjectedTimeDistance, else, do the time calculation
+      if @slope == 0
+        time=maxProjectedTimeDistance
+      else
+        time=((targetBandwidth-@intercept)/@slope).to_i
+      end
       
       #Find out if the bandwidth has already been exceeded
       tb_exceeded = false
