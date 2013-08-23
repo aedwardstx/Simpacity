@@ -29,7 +29,7 @@
       <%= f.select :int_type, ['interface','interface-group'] %>
     </div>
     <div class="field">
-      <%= f.label :link_type_id %>
+      <%= f.label :link_type %>
       <%= f.select :link_type_id, LinkType.all.collect {|link_type| [link_type.name, link_type.id]}  %>
     </div>
     <div class="field">
@@ -40,10 +40,11 @@
       <%= f.label :percentile %>
       <%= f.select :percentile, [['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]] %>
     </div>
-    <div class="field">
-      <%= f.label :watermark %>
-      <%= f.text_field :watermark %>
-    </div>
+    <p>
+      <%= f.label :watermark, 'High Watermark:' %>
+      <%= f.text_field :watermark, id: 'watermark_amount', class: "input-small" %>
+      <div id="watermark" style="max-width: 200px; margin: 10px;"></div>
+    </p>
     <div class="field">
       <%= f.label :days_back %>
       <%= f.number_field :days_back %>
@@ -61,3 +62,25 @@
     </div>
   <% end %>
 </div>
+
+
+<script type="text/javascript" charset="utf-8">
+$(function () {
+    $("#watermark").slider({
+        value: <%= @alert.watermark || Setting.first.default_watermark %>, 
+        min: 0.002,
+        max: 1.000,
+        step: 0.002,
+        slide: function (event, ui) {
+            $("#watermark_amount").val(ui.value);
+        }
+    });
+    $("#watermark_amount").val($("#watermark").slider("value"));
+});
+
+
+$("#watermark_amount").change(function () {
+    $("#watermark").slider('value', $("#watermark_amount").val());
+});
+</script>
+
