@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130822204953) do
+ActiveRecord::Schema.define(version: 20130823224826) do
 
   create_table "alerts", force: true do |t|
     t.boolean  "enabled"
@@ -81,7 +81,6 @@ ActiveRecord::Schema.define(version: 20130822204953) do
     t.integer  "device_id"
     t.string   "description"
     t.string   "name"
-    t.string   "zenossLink"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "link_type_id"
@@ -142,15 +141,6 @@ ActiveRecord::Schema.define(version: 20130822204953) do
     t.integer  "percentile"
     t.integer  "gauge"
     t.string   "record"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "user_preferences", force: true do |t|
-    t.string   "session_id"
-    t.string   "percentile"
-    t.string   "historical_distance"
-    t.integer  "high_watermark"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

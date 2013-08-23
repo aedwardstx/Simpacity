@@ -46,3 +46,7 @@ bundle install
 ./bin/rake db:seed
 
 
+
+ln-s /path_to_simpacity/lib/zpoller-init.sh /etc/init.d/zpoller
+sudo update-rc.d zpoller start 99 2 3 4 5 stop 01 0 1 6
+
