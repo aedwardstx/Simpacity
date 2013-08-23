@@ -7,7 +7,7 @@ class InterfaceBulksController < ApplicationController
   def edit
     device = Device.find(params[:id])
     hostname = device.hostname
-    @bulk_ints = {'device_id' => device.id}
+    @bulk_ints = {'device_id' => device.id, 'device_hostname' => device.hostname}
     @bulk_ints['ints'] = []
     #get the ints from AR
     device.interfaces.each do |int|
