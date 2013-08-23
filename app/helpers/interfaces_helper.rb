@@ -23,7 +23,7 @@ module InterfacesHelper
   def get_poller_health_of_interface(id)
     client = MongoClient.new(Setting.first.mongodb_db_hostname, Setting.first.mongodb_db_port)
     db     = client[Setting.first.mongodb_db_name]
-    recordsShortNames = ['i','o']
+    recordShortNames = ['i','o']
     interface = Interface.find(id)
     device = interface.device
     hostname = device.hostname

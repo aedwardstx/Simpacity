@@ -64,7 +64,7 @@ end
 #     change from per-day,per-record,per-percentile  to  per-record,per-day,per-percentile
 #     This way, the script will cycle seperately for each measurement
 Interface.all.each do |int|
-  puts "DEBUG -- interface=#{int},device=#{int.device.hostname}"
+  puts "DEBUG -- interface=#{int.name},device=#{int.device.hostname}"
   #find first day of data in mongo -- TODO, should not need a loop here, get rid of it
   collection = "host.#{int.device.hostname}"
   firstEntryRef = @db[collection].find.sort( [['_id', :asc]] ).first

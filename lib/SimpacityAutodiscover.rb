@@ -44,7 +44,8 @@ Device.all.each do |device|
     int_ar = device.interfaces.where(:name => int_name)
     puts "int is: #{int_name}, bandwidth is: #{bandwidth}, description is: #{description}"
     InterfaceAutoconfRule.where(:enabled => true).each do |rule|
-      if description =~ /#{rule.description_regex}/ and int_name =~ /#{rule.name_regex}/
+      #check if the interface matches the expressions in the rule -- Also, make sure it does not have a '.' in the name, this currently breaks things
+      if description =~ /#{rule.description_regex}/ and int_name =~ /#{rule.name_regex}/ and not int_name =~ /\./
         if int_ar.length == 1
           #update
           puts "hey hey update"

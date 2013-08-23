@@ -15,7 +15,8 @@ class InterfaceBulksController < ApplicationController
     end
     #get ints for device from mongodb, do not load something that was already loaded from AR
     get_interfaces_for_device(device.id).each do |int|
-      if not @bulk_ints['ints'].any? {|h| h['name'] == int}
+      #if not already in @bulk_ints and the interface name does not contain a period, which causes issues for int health check and importer for some reason
+      if not @bulk_ints['ints'].any? {|h| h['name'] == int} and not int =~ /\./
         (bandwidth,description) = get_interface_metadata_by_name(hostname,int)
         @bulk_ints['ints'] << {'int_id'=>nil,'used'=>'no','name'=>int,'link_type'=>nil,'description'=>description,'bandwidth'=>bandwidth}
       end  
