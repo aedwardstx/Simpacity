@@ -1,0 +1,145 @@
+<h3>Per-Link Statistics</h3>
+
+<div class='well'>
+  <%= form_tag("/frontend/per_link", class: "form-inline") do %>
+    <%= label_tag 'hd_from', 'From Date:' %>
+    <%= text_field_tag 'hd_from', @post_var['hd_from'], id: 'hd_from', class: "input-small" %>
+    <%= label_tag 'hd_to', 'To Date:' %>
+    <%= text_field_tag 'hd_to', @post_var['hd_to'], id: 'hd_to', class: "input-small" %>
+    <%= label_tag 'percentile', 'Percentile:' %>
+    <%= select_tag('percentile', options_for_select([['99th', 1], ['95th', 5], ['90th', 10], ['75th', 25], ['50th', 50], ['All Data', 100]], selected: @post_var['percentile'] ), class: "input-small" ) %> 
+    <p>
+    <%= label_tag 'watermark', 'High Watermark:' %>
+    <%= text_field_tag 'watermark', @post_var['watermark'], id: 'watermark_amount', class: "input-small" %>
+    <div id="watermark" style="max-width: 200px; margin: 10px;"></div>
+    </p>
+    <table><tr>
+    <td>
+    <%= submit_tag "Re-Calculate", class: "btn btn-xs" %>
+    </td>
+  <% end %>
+  <%= form_tag("/frontend/per_link.xls", class: "form-inline") do %>
+    <input type="hidden" name="hd_from" value="<%= @post_var['hd_from']%>">
+    <input type="hidden" name="hd_to" value="<%= @post_var['hd_to']%>">
+    <input type="hidden" name="percentile" value="<%= @post_var['percentile']%>">
+    <input type="hidden" name="watermark" value="<%= @post_var['watermark']%>">
+    <td>
+    <%= submit_tag "Export to XLS", class: "btn btn-xs" %>
+    </td></table>
+  <% end %>
+</div>
+<div>
+<table id="dt_frontend_pl">
+  <thead>
+    <tr>
+      <th>Hostname</th>
+      <th>Interface</th>
+      <th>Link Type</th>
+      <th>Bandwidth</th>
+      <th>Rx Projected</th>
+      <th>Rx Average bps</th>
+      <th>Tx Projected</th>
+      <th>Tx Average bps</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @charts.each_key do |int_id| %>
+      <tr>
+        <td><%= @charts[int_id]['deviceHostname'] %></td>
+        <td><%= @charts[int_id]['interfaceName'] %></td>
+        <td><%= @charts[int_id]['interfaceLinkType'] %></td>
+        <td><%= @charts[int_id]['bandwidth'] / 1000000 %>Mbps</td>
+        <td><%= @charts[int_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
+        <td><%= number_to_human_size(@charts[int_id]['ifInOctets']['values']['average_rate'], :precision => 4) %></td>
+        <td><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
+        <td><%= number_to_human_size(@charts[int_id]['ifOutOctets']['values']['average_rate'], :precision => 4) %></td>
+        <td><%= button_to_function "Chart it!", "chartit('#{@charts[int_id]['deviceHostname']}','#{@charts[int_id]['interfaceName']}',#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-mini" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<div id="container" style="min-width: 300px; height: 360px;"></div>
+
+<% content_for :sidebar do %>
+  <h4>Information</h4>
+  All information on this page reflects the scope of the parameters provided. </br>
+  <b>Percentile:</b> Statistics are generated primarily by walking the measurements gathered from the devices in blocks of 100(of the value of SliceSize).  Percentile controls the top X number of measurements that are taken into consideration when generating statistics within the SliceSize.  99th = Top 1 measurements per 100 collected, 75th = Top 25 measurements per 100 collected, etc.</br>
+  <b>High Watermark:</b> Controls what to consider a fully loaded link.  Range 0.001 -- 1.000 e.g. 0.40 would be 40% of bandwidth </br>
+<% end %>
+
+<script type="text/javascript" charset="utf-8">
+
+var options = {
+    chart: {
+      renderTo: 'container',
+      defaultSeriesType: 'spline'
+           },
+    xAxis: { type: 'datetime' },
+    yAxis: { title: { text: 'bps' }},
+    tooltip: {
+      formatter: function () {
+        return Highcharts.dateFormat("%B %e %Y", this.x) + ': ' +
+          Highcharts.numberFormat(this.y, 0) + 'bps';
+      }
+    }    
+};
+
+
+function chartit( dev_hostname, int_name, int_id, watermark, percentile, start_epoch, end_epoch ) { 
+  var jsonURL = '<%= frontend_get_perlink_chart_path %>' + '?int_id=' + int_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
+  $.getJSON( jsonURL, function( json ) {
+    options.series = [{
+      name: 'In-bps',
+      data: json['ifInOctets']['points']
+    },{
+      name: 'Out-bps',
+      data: json['ifOutOctets']['points']
+    },{
+      name: 'In-bps-Average',
+      data: json['ifInOctets']['stats']['average_rate']
+    },{
+      name: 'In-bps-Projection',
+      data: json['ifInOctets']['stats']['projection']
+    },{
+      name: 'Out-bps-Average',
+      data: json['ifOutOctets']['stats']['average_rate']
+    },{
+      name: 'Out-bps-Projection',
+      data: json['ifOutOctets']['stats']['projection']
+    },{
+      name: 'High Watermark',
+      data: json['watermark']
+    }];
+    options.title = { text: dev_hostname + ":" + int_name }
+    var chart = new Highcharts.Chart(options);
+    chart.series[6].hide()
+  });
+}
+
+
+$(function () {
+    $("#watermark").slider({
+        value: <%= @post_var['watermark']%>,
+        min: 0.002,
+        max: 1.000,
+        step: 0.002,
+        slide: function (event, ui) {
+            $("#watermark_amount").val(ui.value);
+        }
+    });
+    $("#watermark_amount").val($("#watermark").slider("value"));
+});
+
+
+$("#watermark_amount").change(function () {
+    $("#watermark").slider('value', $("#watermark_amount").val());
+});
+
+
+
+
+</script>

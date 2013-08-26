@@ -1,0 +1,14 @@
+simpacity_custom:
+  number:
+    human:
+      storage_units:
+        format: "%n %u"
+        units:
+          byte:
+            one: "Bit"
+            other: "Bits"
+          kb: "Kbps"
+          mb: "Mbps"
+          gb: "Gbps"
+          tb: "Tbps"
+
