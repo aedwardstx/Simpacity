@@ -8,6 +8,17 @@ jQuery ->
     "sPaginationType": "bootstrap",
     "aoColumnDefs": [
       { 'bSortable': false, 'aTargets': [ 8 ] }
+    ],
+    "aoColumns": [
+      null,
+      null,
+      null,
+      { "sType": "data-speed" },
+      null,
+      { "sType": "data-speed" },
+      null,
+      { "sType": "data-speed" },
+      null
     ]
   })
   $('#dt_frontend_lg').dataTable({
@@ -15,6 +26,15 @@ jQuery ->
     "sPaginationType": "bootstrap",
     "aoColumnDefs": [
       { 'bSortable': false, 'aTargets': [ 6 ] }
+    ]
+    "aoColumns": [
+      null,
+      { "sType": "data-speed" },
+      null,
+      { "sType": "data-speed" },
+      null,
+      { "sType": "data-speed" },
+      null
     ]
   })
 

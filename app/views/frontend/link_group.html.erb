@@ -28,7 +28,7 @@
   <% end %>
 </div>
 
-<table id="dt_frontend_lg">
+<table id="dt_frontend_lg" width=100%>
   <thead>
     <tr>
       <th>Interface Group</th>
@@ -45,11 +45,11 @@
     <% @charts.each_key do |ig_id| %>
       <tr>
         <td><%= @charts[ig_id]['int_group_name'] %></td>
-        <td><%= @charts[ig_id]['bandwidth'] / 1000000 %>Mbps</td>
+        <td><%= number_to_human_size(@charts[ig_id]['bandwidth'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
         <td><%= @charts[ig_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
-        <td><%= @charts[ig_id]['ifInOctets']['values']['average_rate'] / 1000 %>kbps</td>
+        <td><%= number_to_human_size(@charts[ig_id]['ifInOctets']['values']['average_rate'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
         <td><%= @charts[ig_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
-        <td><%= @charts[ig_id]['ifOutOctets']['values']['average_rate'] / 1000 %>kbps</td>
+        <td><%= number_to_human_size(@charts[ig_id]['ifOutOctets']['values']['average_rate'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
         <td><%= button_to_function "Chart it!", "chartit('#{@charts[ig_id]['int_group_name']}',#{ig_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-mini" %></td>
       </tr>
     <% end %>
@@ -133,5 +133,24 @@ $(function () {
 $("#watermark_amount").change(function () {
     $("#watermark").slider('value', $("#watermark_amount").val());
 });
+
+jQuery.fn.dataTableExt.oSort['data-speed-pre'] = function(a) {
+        var x = a.substring(0,a.length - 5);
+
+        var x_unit = (a.substring(a.length - 4, a.length) == "Kbps" ?
+            1000 : (a.substring(a.length - 4, a.length) == "Mbps" ?
+            1000000 : (a.substring(a.length - 4, a.length) == "Gbps" ?
+            1000000000 : (a.substring(a.length - 4, a.length) == "Tbps" ?
+            1000000000000 : 1))));
+
+        return parseInt( x * x_unit, 10 );
+    };
+jQuery.fn.dataTableExt.oSort['data-speed-asc'] = function(a,b) {
+        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+
+jQuery.fn.dataTableExt.oSort['data-speed-desc'] = function(a,b) {
+        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+  };
 
 </script>
