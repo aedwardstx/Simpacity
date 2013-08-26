@@ -1,5 +1,5 @@
 <h3>Interface Settings</h3>
-<table id='dt_interfaces'>
+<table id='dt_interfaces' width=100%>
   <thead>
     <tr>
       <th>Device</th>
@@ -8,7 +8,6 @@
       <th>Description</th>
       <th>Bandwidth</th>
       <th>Poller Health</th>
-      <th></th>
       <th></th>
     </tr>
   </thead>
@@ -22,8 +21,10 @@
         <td><%= interface.description %></td>
         <td><%=(interface.bandwidth / 1000000)%>Mbps</td>
         <td><%= get_poller_health_of_interface(interface.id) %></td>
-        <td><%= link_to 'Edit', edit_interface_path(interface), :class => 'btn btn-mini'%></td>
-        <td><%= link_to 'Destroy', interface, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+        <td>
+          <%= link_to 'Edit', edit_interface_path(interface), :class => 'btn btn-mini'%>
+          <%= link_to 'Destroy', interface, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %>
+        </td>
       </tr>
     <% end %>
   </tbody>

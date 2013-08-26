@@ -6,11 +6,13 @@ class InterfacesController < ApplicationController
     @interfaces = Interface.all
     matches = []
     Interface.all.each do |int|
-      if "#{int.device.hostname}-#{int.name}" =~ /#{params[:q]}/i
-        matches << int.id
-      elsif params[:q] == ''
-        matches << int.id
+      match = true
+      params[:q].split(/ /).each do |query|
+        if not "#{int.device.hostname}_#{int.name}_#{int.link_type.name}" =~ /#{query}/i
+          match = false 
+        end
       end
+      matches << int.id if match == true
     end
     
     matching_ints = Interface.find_all_by_id(matches)
@@ -18,7 +20,7 @@ class InterfacesController < ApplicationController
     #devices = Interface.device.where("hostname like ?", "%#{params[:q]}%")
     respond_to do |format|
       format.html
-      format.json { render :json => matching_ints.collect {|int| {:id => int.id, :name => "#{int.device.hostname}-#{int.name}"}}}
+      format.json { render :json => matching_ints.collect {|int| {:id => int.id, :name => "#{int.device.hostname}_#{int.name}_#{int.link_type.name}"}}}
     end
   end
 

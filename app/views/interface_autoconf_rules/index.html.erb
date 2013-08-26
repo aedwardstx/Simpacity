@@ -1,13 +1,12 @@
 <h3>Interface Auto-Configuration Rules</h3>
 
-<table id='dt_interface_autoconf'>
+<table id='dt_interface_autoconf' width=100%>
   <thead>
     <tr>
       <th>Enabled</th>
       <th>Name Regex</th>
       <th>Description Regex</th>
       <th>Link Type</th>
-      <th></th>
       <th></th>
     </tr>
   </thead>
@@ -19,8 +18,10 @@
         <td><%= interface_autoconf_rule.name_regex %></td>
         <td><%= interface_autoconf_rule.description_regex %></td>
         <td><%= interface_autoconf_rule.link_type.name %></td>
-        <td><%= link_to 'Edit', edit_interface_autoconf_rule_path(interface_autoconf_rule), :class => 'btn btn-mini'  %></td>
-        <td><%= link_to 'Destroy', interface_autoconf_rule, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger'  %></td>
+        <td>
+          <%= link_to 'Edit', edit_interface_autoconf_rule_path(interface_autoconf_rule), :class => 'btn btn-mini'  %>
+          <%= link_to 'Destroy', interface_autoconf_rule, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger'  %>
+        </td>
       </tr>
     <% end %>
   </tbody>

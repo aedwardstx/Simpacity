@@ -1,12 +1,11 @@
 <h3>Contact Groups</h3>
 
-<table id='dt_contact_groups'>
+<table id='dt_contact_groups' width=100%>
   <thead>
     <tr>
       <th>Name</th>
       <th>Description</th>
       <th>Email addresses</th>
-      <th></th>
       <th></th>
     </tr>
   </thead>
@@ -17,8 +16,10 @@
         <td><%= contact_group.name %></td>
         <td><%= contact_group.description %></td>
         <td><%= contact_group.email_addresses %></td>
-        <td><%= link_to 'Edit', edit_contact_group_path(contact_group), :class => 'btn btn-mini'%></td>
-        <td><%= link_to 'Destroy', contact_group, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+        <td>
+          <%= link_to 'Edit', edit_contact_group_path(contact_group), :class => 'btn btn-mini'%>
+          <%= link_to 'Destroy', contact_group, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %>
+        </td>
       </tr>
     <% end %>
   </tbody>

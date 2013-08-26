@@ -22,7 +22,7 @@
     </div>
     <div class="field">
       <%= f.label :interface_tokens, "Interfaces" %> 
-      <%= f.text_field :interface_tokens, "data-pre" => @interface_group.interfaces.all.collect {|int| {:id => int.id, :name => "#{int.device.hostname}-#{int.name}"}}.to_json %>
+      <%= f.text_field :interface_tokens, "data-pre" => @interface_group.interfaces.all.collect {|int| {:id => int.id, :name => "#{int.device.hostname}_#{int.name}_#{int.link_type.name}"}}.to_json %>
     </div>
     <div class="field">
       <%= f.label :refresh_next_import %> 

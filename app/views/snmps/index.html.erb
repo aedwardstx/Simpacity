@@ -1,12 +1,11 @@
 <h3>SNMP Settings</h3>
 
-<table id='dt_snmp'>
+<table id='dt_snmp' width=100%>
   <thead>
     <tr>
       <th>Name</th>
       <th>Community String</th>
       <th>Default</th>
-      <th></th>
       <th></th>
     </tr>
   </thead>
@@ -17,8 +16,10 @@
         <td><%= snmp.name %></td>
         <td><%= snmp.community_string %></td>
         <td><%= snmp.default_community %></td>
-        <td><%= link_to 'Edit', edit_snmp_path(snmp), :class => 'btn btn-mini' %></td>
-        <td><%= link_to 'Destroy', snmp, method: :delete, data: { confirm: 'Are you sure?'}, :class => 'btn btn-mini btn-danger' %></td>
+        <td>
+          <%= link_to 'Edit', edit_snmp_path(snmp), :class => 'btn btn-mini' %>
+          <%= link_to 'Destroy', snmp, method: :delete, data: { confirm: 'Are you sure?'}, :class => 'btn btn-mini btn-danger' %>
+        </td>
       </tr>
     <% end %>
   </tbody>

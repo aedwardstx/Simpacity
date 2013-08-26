@@ -1,11 +1,10 @@
 <h3>Link Type Settings</h3>
 
-<table id='dt_link_type'>
+<table id='dt_link_type' width=100%>
   <thead>
     <tr>
       <th>Name</th>
       <th>Description</th>
-      <th></th>
       <th></th>
     </tr>
   </thead>
@@ -15,8 +14,10 @@
       <tr>
         <td><%= link_type.name %></td>
         <td><%= link_type.description %></td>
-        <td><%= link_to 'Edit', edit_link_type_path(link_type), :class => 'btn btn-mini' %></td>
-        <td><%= link_to 'Destroy', link_type, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+        <td>
+          <%= link_to 'Edit', edit_link_type_path(link_type), :class => 'btn btn-mini' %>
+          <%= link_to 'Destroy', link_type, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %>
+        </td>
       </tr>
     <% end %>
   </tbody>
