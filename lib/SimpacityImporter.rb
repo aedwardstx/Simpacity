@@ -55,7 +55,7 @@ def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
   @db[collection].find({'_id' => {:$gt => startTime.to_i, :$lt => endTime.to_i}}).each do |measurement|
       #puts "line #{measurement['_id']} #{measurement['rate'][interface][recordName]}"
       xvals << measurement['_id']
-      yvals << measurement['rate'][interface][recordName]
+      yvals << measurement['rate'][interface][recordName] * 8 
   end
   return xvals, yvals
 end
@@ -66,6 +66,7 @@ end
 Interface.all.each do |int|
   puts "DEBUG -- interface=#{int.name},device=#{int.device.hostname}"
   #find first day of data in mongo -- TODO, should not need a loop here, get rid of it
+  bandwidth = int.bandwidth
   collection = "host.#{int.device.hostname}"
   firstEntryRef = @db[collection].find.sort( [['_id', :asc]] ).first
   firstEntryEpoch = firstEntryRef['_id']
@@ -119,7 +120,13 @@ Interface.all.each do |int|
           sMath.findSIForPercentile(percentile)
           sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
           sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
-          
+         
+          #This is a safe gaurd against the derived bandwidth being greater than the interface bandwidth.
+          #   This often happens for the first 12 hour datapoint as there is only partial information collected.
+          #   This problem will be more throughly addressed in the future.
+          sampleY0600 = bandwidth / 2 if sampleY0600 > bandwidth
+          sampleY1800 = bandwidth / 2 if sampleY1800 > bandwidth
+
           puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
           puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
 

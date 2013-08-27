@@ -50,6 +50,14 @@ recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
 @client = MongoClient.new(Setting.first.mongodb_db_hostname, Setting.first.mongodb_db_port)
 @db     = @client[Setting.first.mongodb_db_name]
 
+
+def get_int_group_bandwidth(int_group_id)
+  interface_group = InterfaceGroup.find(int_group_id)
+  bandwidth = 0
+  interface_group.interfaces.each { |int| bandwidth += int.bandwidth }
+  return bandwidth
+end
+
 def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
   #Passed a hostname, interface, recordName, startTime, endTime
   #puts "getRawMeasurements DEBUG -- hostname=#{hostname},interface=#{interface},recordName=#{recordName},startTime=#{startTime},endTime=#{endTime}"
@@ -61,7 +69,7 @@ def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
   @db[collection].find({'_id' => {:$gt => startTime.to_i, :$lt => endTime.to_i}}).each do |measurement|
       #puts "line #{measurement['_id']} #{measurement['rate'][interface][recordName]}"
       xvals << measurement['_id']
-      yvals << measurement['rate'][interface][recordName]
+      yvals << measurement['rate'][interface][recordName] * 8
   end
   return xvals, yvals
 end
@@ -78,6 +86,8 @@ InterfaceGroup.all.each do |int_group|
     int_group.refresh_next_import = 0
     int_group.save
   end
+
+  bandwidth = get_int_group_bandwidth(int_group.id)
 
   #Find the earliest mongodb entry for the interface group
   firstEntryEpoch = Time.now.to_i 
@@ -116,8 +126,6 @@ InterfaceGroup.all.each do |int_group|
           #do nothing
           puts "Doing nothing, #{int_group.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordName}"
         else
-          puts "Starting else loop"
-
           #Clean up the entries if needed 
           ar_dayIncrement0600.destroy_all
           ar_dayIncrement1800.destroy_all
@@ -137,7 +145,13 @@ InterfaceGroup.all.each do |int_group|
           sMath.findSIForPercentile(percentile)
           sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
           sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
-          
+
+          #This is a safe gaurd against the derived bandwidth being greater than the interface bandwidth.
+          #   This often happens for the first 12 hour datapoint as there is only partial information collected.
+          #   This problem will be more throughly addressed in the future.
+          sampleY0600 = bandwidth / 2 if sampleY0600 > bandwidth
+          sampleY1800 = bandwidth / 2 if sampleY1800 > bandwidth
+    
           #update record in AR
           puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
           int_group.srlg_measurement.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
