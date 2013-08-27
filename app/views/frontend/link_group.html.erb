@@ -73,38 +73,42 @@
 var options = {
     chart: {
       renderTo: 'container',
-      defaultSeriesType: 'spline'
-             },
-    xAxis: { type: 'datetime' },
+      defaultSeriesType: 'spline',
+      zoomType: 'x'
+           },
+    xAxis: {
+      type: 'datetime',
+      maxZoom: 5 * 24 * 3600000, // five days
+           },
     yAxis: { title: { text: 'bps' }},
     tooltip: {
       formatter: function () {
         return Highcharts.dateFormat("%B %e %Y", this.x) + ': ' +
           Highcharts.numberFormat(this.y, 0) + 'bps';
       }
-    }    
+    }
 };
 
 function chartit( ig_name, ig_id, watermark, percentile, start_epoch, end_epoch ) { 
   var jsonURL = '<%= frontend_get_int_group_chart_path %>' + '?ig_id=' + ig_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
   $.getJSON( jsonURL, function( json ) {
     options.series = [{
-      name: 'In-bps',
+      name: 'Rx-bps',
       data: json['ifInOctets']['points']
     },{
-      name: 'Out-bps',
-      data: json['ifOutOctets']['points']
-    },{
-      name: 'In-bps-Average',
+      name: 'Rx-bps-Average',
       data: json['ifInOctets']['stats']['average_rate']
     },{
-      name: 'In-bps-Projection',
+      name: 'Rx-bps-Projection',
       data: json['ifInOctets']['stats']['projection']
     },{
-      name: 'Out-bps-Average',
+      name: 'Tx-bps',
+      data: json['ifOutOctets']['points']
+    },{
+      name: 'Tx-bps-Average',
       data: json['ifOutOctets']['stats']['average_rate']
     },{
-      name: 'Out-bps-Projection',
+      name: 'Tx-bps-Projection',
       data: json['ifOutOctets']['stats']['projection']
     },{
       name: 'High Watermark',

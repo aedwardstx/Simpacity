@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130826131805) do
+ActiveRecord::Schema.define(version: 20130827145249) do
 
   create_table "alerts", force: true do |t|
     t.boolean  "enabled"
@@ -125,6 +125,9 @@ ActiveRecord::Schema.define(version: 20130826131805) do
     t.string   "mailhost"
     t.integer  "polling_interval_secs"
     t.integer  "max_trending_future_days"
+    t.integer  "min_alert_measurements_percent"
+    t.integer  "min_bps_for_inclusion",               limit: 8
+    t.string   "source_email_address"
   end
 
   create_table "snmps", force: true do |t|

@@ -13,7 +13,14 @@ class Setting < ActiveRecord::Base
   validates_presence_of :mongodb_db_hostname
   validates_presence_of :mongodb_db_port
   validates_presence_of :mongodb_db_name
+  validates_presence_of :link_group_importer_lookback_window
+  validates_presence_of :zpoller_poller_interval
+  validates_presence_of :mailhost
   validates_presence_of :max_trending_future_days
   validates_presence_of :polling_interval_secs
+  validates_presence_of :min_alert_measurements_percent
+  validates_presence_of :min_bps_for_inclusion 
+  validates_presence_of :source_email_address
+
 
 end

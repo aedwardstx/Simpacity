@@ -7,7 +7,6 @@
       <th>Interfaces</th>
       <th>Refresh Next Import?</th>
       <th></th>
-      <th></th>
     </tr>
   </thead>
 
@@ -17,8 +16,10 @@
         <td><%= interface_group.name %></td>
         <td><%= interface_group.interfaces.count %> </td>
         <td><%= interface_group.refresh_next_import %></td>
-        <td><%= link_to 'Edit', edit_interface_group_path(interface_group),:class => 'btn btn-mini' %></td>
-        <td><%= link_to 'Destroy', interface_group, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %></td>
+        <td>
+          <%= link_to 'Edit', edit_interface_group_path(interface_group),:class => 'btn btn-mini' %>
+          <%= link_to 'Destroy', interface_group, method: :delete, data: { confirm: 'Are you sure?' }, :class => 'btn btn-mini btn-danger' %>
+        </td>
       </tr>
     <% end %>
   </tbody>

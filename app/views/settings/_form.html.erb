@@ -84,6 +84,18 @@
       <%= f.label :polling_interval_secs %>
       <%= f.number_field :polling_interval_secs %>
     </div>
+    <div class="field">
+      <%= f.label :min_alert_measurements_percent %>
+      <%= f.number_field :min_alert_measurements_percent %>
+    </div>
+    <div class="field">
+      <%= f.label :min_bps_for_inclusion %>
+      <%= f.number_field :min_bps_for_inclusion %>
+    </div>
+    <div class="field">
+      <%= f.label :source_email_address %>
+      <%= f.text_field :source_email_address %>
+    </div>
 
     <div class="actions">
       <%= f.submit %>

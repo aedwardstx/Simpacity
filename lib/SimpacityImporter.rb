@@ -45,17 +45,28 @@ recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
 @client = MongoClient.new(Setting.first.mongodb_db_hostname, Setting.first.mongodb_db_port)
 @db     = @client[Setting.first.mongodb_db_name]
 
+
 def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
   #Passed a hostname, interface, recordName, startTime, endTime
   #puts "getRawMeasurements DEBUG -- hostname=#{hostname},interface=#{interface},recordName=#{recordName},startTime=#{startTime},endTime=#{endTime}"
+  min_bps_for_inclusion = Setting.first.min_bps_for_inclusion
   collection = "host.#{hostname}"
   xvals = Array.new
   yvals = Array.new
 
   @db[collection].find({'_id' => {:$gt => startTime.to_i, :$lt => endTime.to_i}}).each do |measurement|
-      #puts "line #{measurement['_id']} #{measurement['rate'][interface][recordName]}"
-      xvals << measurement['_id']
-      yvals << measurement['rate'][interface][recordName] * 8 
+    if defined? measurement['rate'][interface][recordName]
+      gauge = measurement['rate'][interface][recordName] * 8  
+      if gauge >= min_bps_for_inclusion
+        #puts "line #{measurement['_id']} #{gauge}"
+        xvals << measurement['_id']
+        yvals << gauge
+      else
+        puts "Excluding measurement #{measurement['_id']}-#{hostname}-#{interface}-#{recordName}-#{gauge}"
+      end
+    else
+      puts "skipping as not defined"
+    end
   end
   return xvals, yvals
 end
@@ -124,8 +135,8 @@ Interface.all.each do |int|
           #This is a safe gaurd against the derived bandwidth being greater than the interface bandwidth.
           #   This often happens for the first 12 hour datapoint as there is only partial information collected.
           #   This problem will be more throughly addressed in the future.
-          sampleY0600 = bandwidth / 2 if sampleY0600 > bandwidth
-          sampleY1800 = bandwidth / 2 if sampleY1800 > bandwidth
+          sampleY0600 = bandwidth / 4 if sampleY0600 > bandwidth
+          sampleY1800 = bandwidth / 4 if sampleY1800 > bandwidth
 
           puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
           puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"

@@ -7,9 +7,11 @@ class InterfacesController < ApplicationController
     matches = []
     Interface.all.each do |int|
       match = true
-      params[:q].split(/ /).each do |query|
-        if not "#{int.device.hostname}_#{int.name}_#{int.link_type.name}" =~ /#{query}/i
-          match = false 
+      if params[:q]
+        params[:q].split(/ /).each do |query|
+          if not "#{int.device.hostname}_#{int.name}_#{int.link_type.name}" =~ /#{query}/i
+            match = false 
+          end
         end
       end
       matches << int.id if match == true

@@ -59,6 +59,11 @@ class SettingsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def setting_params
-      params.require(:setting).permit(:slice_size, :default_percentile, :default_watermark, :max_hist_dist, :default_hist_dist, :zpoller_rc_location, :zconfig_location, :zpoller_hosts_location, :zpoller_base_dir, :mongodb_test_window, :mongodb_db_hostname, :mongodb_db_port, :mongodb_db_name, :link_group_importer_lookback_window, :zpoller_poller_interval, :mailhost, :polling_interval_secs, :max_trending_future_days)
+      params.require(:setting).permit(:slice_size, :default_percentile, :default_watermark, :max_hist_dist, :default_hist_dist, 
+                                      :zpoller_rc_location, :zconfig_location, :zpoller_hosts_location, :zpoller_base_dir, 
+                                      :mongodb_test_window, :mongodb_db_hostname, :mongodb_db_port, :mongodb_db_name, 
+                                      :link_group_importer_lookback_window, :zpoller_poller_interval, :mailhost, 
+                                      :polling_interval_secs, :max_trending_future_days, :min_alert_measurements_percent,
+                                      :min_bps_for_inclusion, :source_email_address)
     end
 end

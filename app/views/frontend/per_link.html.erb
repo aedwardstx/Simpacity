@@ -76,9 +76,13 @@
 var options = {
     chart: {
       renderTo: 'container',
-      defaultSeriesType: 'spline'
+      defaultSeriesType: 'spline',
+      zoomType: 'x'
            },
-    xAxis: { type: 'datetime' },
+    xAxis: { 
+      type: 'datetime',
+      maxZoom: 5 * 24 * 3600000, // five days 
+           },
     yAxis: { title: { text: 'bps' }},
     tooltip: {
       formatter: function () {
@@ -93,22 +97,22 @@ function chartit( dev_hostname, int_name, int_id, watermark, percentile, start_e
   var jsonURL = '<%= frontend_get_perlink_chart_path %>' + '?int_id=' + int_id + '&watermark=' + watermark  + '&percentile=' + percentile + '&start_epoch=' + start_epoch + '&end_epoch=' + end_epoch;
   $.getJSON( jsonURL, function( json ) {
     options.series = [{
-      name: 'In-bps',
+      name: 'Rx-bps',
       data: json['ifInOctets']['points']
     },{
-      name: 'Out-bps',
-      data: json['ifOutOctets']['points']
-    },{
-      name: 'In-bps-Average',
+      name: 'Rx-bps-Average',
       data: json['ifInOctets']['stats']['average_rate']
     },{
-      name: 'In-bps-Projection',
+      name: 'Rx-bps-Projection',
       data: json['ifInOctets']['stats']['projection']
     },{
-      name: 'Out-bps-Average',
+      name: 'Tx-bps',
+      data: json['ifOutOctets']['points']
+    },{
+      name: 'Tx-bps-Average',
       data: json['ifOutOctets']['stats']['average_rate']
     },{
-      name: 'Out-bps-Projection',
+      name: 'Tx-bps-Projection',
       data: json['ifOutOctets']['stats']['projection']
     },{
       name: 'High Watermark',
