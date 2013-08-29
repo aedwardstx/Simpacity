@@ -38,9 +38,9 @@ sudo gem install bson_ext
 
 ##Changes to Simpacity to suite your environment
 Correct the path for SimpactiyMath in Gemfile
-Correct the path for simpacity_base in all ./lib/Simpacity.* files
-Change the database.yaml file to suite your environment
-Change the ldap.yaml configuration file to meet your needs
+Correct the path for simpacity_base in all lib/Simpacity.* files
+Change the config/database.yml file to suite your environment
+Change the config/ldap.yml configuration file to meet your needs
 ```
 bundle  
 bundle install  
