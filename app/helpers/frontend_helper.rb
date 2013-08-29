@@ -19,10 +19,17 @@ module FrontendHelper
         @chart[record]['points'][index] << element.to_i * 1000
         @chart[record]['points'][index] << arrayOfY[index]
       end
-      (projection,average_rate,projection_start,projection_end) = get_int_stats(int_id, percentile, record, start_epoch, end_epoch, watermark)
-      @chart[record]['stats']['average_rate'] = [[start_epoch * 1000,average_rate],[end_epoch * 1000,average_rate]]
-      @chart[record]['stats']['projection'] = [[start_epoch * 1000,projection_start],[end_epoch * 1000,projection_end]] 
-      @chart['watermark'] = [[start_epoch * 1000,watermark * bandwidth],[end_epoch * 1000,watermark * bandwidth]] 
+
+      first_record_point_x = @chart[record]['points'][0][0] 
+      last_record_point_x = @chart[record]['points'][-1][0]
+      first_projection_point_x = first_record_point_x / 1000
+      #TODO -- abstarct the number of future days to graph a projection into general settings
+      last_projection_point_x = (last_record_point_x / 1000) + (84600 * 30)
+
+      (projection,average_rate,projection_start,projection_end) = get_int_stats(int_id, percentile, record, first_projection_point_x, last_projection_point_x, watermark)
+      @chart[record]['stats']['average_rate'] = [[first_record_point_x,average_rate],[last_record_point_x,average_rate]]
+      @chart[record]['stats']['projection'] = [[first_projection_point_x * 1000,projection_start],[last_projection_point_x * 1000,projection_end]] 
+      @chart['watermark'] = [[first_record_point_x,watermark * bandwidth],[last_projection_point_x * 1000,watermark * bandwidth]] 
     end
     respond_to do |format|
       format.json { render :json => @chart.to_json }
@@ -34,7 +41,6 @@ module FrontendHelper
     percentile = params[:percentile].to_f
     start_epoch = params[:start_epoch].to_i
     end_epoch = params[:end_epoch].to_i
-    #TODO -- move get bandwidth to get_int_stats -- should I really do this?
     bandwidth = get_int_group_bandwidth(int_group_id) 
     watermark = params[:watermark].to_f
     @chart = {}
@@ -48,10 +54,17 @@ module FrontendHelper
         @chart[record]['points'][index] << element.to_i * 1000
         @chart[record]['points'][index] << arrayOfY[index]
       end
-      (projection,average_rate,projection_start,projection_end) = get_int_group_stats(int_group_id, percentile, record, start_epoch, end_epoch, watermark)
-      @chart[record]['stats']['average_rate'] = [[start_epoch * 1000,average_rate],[end_epoch * 1000,average_rate]]
-      @chart[record]['stats']['projection'] = [[start_epoch * 1000,projection_start],[end_epoch * 1000,projection_end]] 
-      @chart['watermark'] = [[start_epoch * 1000,watermark * bandwidth],[end_epoch * 1000,watermark * bandwidth]] 
+
+      first_record_point_x = @chart[record]['points'][0][0] 
+      last_record_point_x = @chart[record]['points'][-1][0]
+      first_projection_point_x = first_record_point_x / 1000
+      #TODO -- abstarct the number of future days to graph a projection into general settings
+      last_projection_point_x = (last_record_point_x / 1000) + (84600 * 30)
+
+      (projection,average_rate,projection_start,projection_end) = get_int_group_stats(int_group_id, percentile, record, first_projection_point_x, last_projection_point_x, watermark)
+      @chart[record]['stats']['average_rate'] = [[first_record_point_x,average_rate],[last_record_point_x,average_rate]]
+      @chart[record]['stats']['projection'] = [[first_projection_point_x * 1000,projection_start],[last_projection_point_x * 1000,projection_end]] 
+      @chart['watermark'] = [[first_record_point_x,watermark * bandwidth],[last_projection_point_x * 1000,watermark * bandwidth]] 
     end
     respond_to do |format|
       format.json { render :json => @chart.to_json }
