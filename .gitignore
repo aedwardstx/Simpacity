@@ -13,7 +13,7 @@
 
 #Simpacity custom ignore
 /config/database.yml
-/config/ldap.yaml
+/config/ldap.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
