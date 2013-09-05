@@ -1,7 +1,7 @@
 #Overview
 Simpacity is a Rails 4 based network link capacity management application built to satisfy the basic requirements of an enterprise.  This project is currently in development and is being tested on production data.  It works by analyzing thousands of time series records to create trends based on a [Simple Linear Regression Trending Algorithm](http://en.wikipedia.org/wiki/Simple_linear_regression).  It has support for interface-groups(Shared Risk Link Groups), threshold alerting, auto-discovery of interfaces and devices, HighCharts graphing, Devise based LDAP authentication, and more to come.  Please feel free to reach out to me if you have any questions concerning the project.
 
-![Simpacity App Flow](http://imgur.com/hwWRITO "Application Flow")
+![Simpacity App Flow](http://i.imgur.com/hwWRITO.png "Application Flow")
 
 
 ##Dependencies:
