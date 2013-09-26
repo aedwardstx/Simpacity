@@ -91,10 +91,10 @@ yesterdayEndOfDay = yesterdayNow.change(:hour => 23, :min=> 59, :sec => 59)
 
 InterfaceGroup.all.each do |int_group|
   #if the refresh_next_import bool is true, delete all points in AR for the interface_group
-  if int_group.refresh_next_import == 1 
+  if int_group.refresh_next_import == true 
     puts "Deleting all entries in AR for #{int_group.name} as refresh_next_import was set to true"
     int_group.srlg_measurement.destroy_all  #delete_all may be faster and all thats needed
-    int_group.refresh_next_import = 0
+    int_group.refresh_next_import = false
     int_group.save
   end
 

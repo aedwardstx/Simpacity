@@ -14,12 +14,8 @@ class Device < ActiveRecord::Base
   #validates_format_of :hostname, :with => /(?=^.{1,254}$)(^(?:(?!\d+\.|-)[a-zA-Z0-9_\-]{1,63}(?<!-)\.)+(?:[a-zA-Z]{2,})$)/i
   #validates_presence_of :description
 
-
-  #before_save :default_values
-
   #after_save :update_zpoller, on: [:create, :update]
   #after_destroy :update_zpoller
-
 
   #validate :hostname_resolvable, on: :create
   
