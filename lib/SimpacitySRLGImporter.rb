@@ -69,7 +69,9 @@ def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
   #TODO PERFORMANCE This could be a slowdown, see if there is a way to directly map 
   @db[collection].find({'_id' => {:$gt => startTime.to_i, :$lt => endTime.to_i}}).each do |measurement|
     #puts "line #{measurement['_id']} #{measurement.inspect}"
-    if defined? measurement['rate'][interface][recordName]
+    if defined? measurement['rate'][interface][recordName] and measurement['rate'][interface][recordName].is_a? Integer
+      #puts "gauge would be: #{measurement['rate'][interface].inspect} * 8 -- recordName: #{recordName}"
+      #puts "condition is true - #{interface}/#{recordName}" if defined? measurement['rate'][interface][recordName]
       gauge = measurement['rate'][interface][recordName] * 8
       if gauge >= min_bps_for_inclusion
         #puts "line #{measurement['_id']} #{gauge}"

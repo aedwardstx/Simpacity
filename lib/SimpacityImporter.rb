@@ -55,7 +55,7 @@ def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
   yvals = Array.new
 
   @db[collection].find({'_id' => {:$gt => startTime.to_i, :$lt => endTime.to_i}}).each do |measurement|
-    if defined? measurement['rate'][interface][recordName]
+    if defined? measurement['rate'][interface][recordName] and measurement['rate'][interface][recordName].is_a? Integer
       gauge = measurement['rate'][interface][recordName] * 8  
       if gauge >= min_bps_for_inclusion
         #puts "line #{measurement['_id']} #{gauge}"

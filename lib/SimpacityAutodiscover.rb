@@ -51,8 +51,8 @@ Device.all.each do |device|
           puts "hey hey update"
         elsif int_ar.length == 0
           #create
-          puts "hey hey create"
-          device.interfaces.create(:name => int_name, :link_type_id => rule.link_type_id, :description => description, :bandwidth => bandwidth) 
+          puts "I am creating an entry - device: #{device.hostname}, int_name: #{int_name}, link_type_id: #{rule.link_type_id}, description: #{description}, bandwidth: #{bandwidth}"
+          #device.interfaces.create(:name => int_name, :link_type_id => rule.link_type_id, :description => description, :bandwidth => bandwidth) 
         else
           puts 'This shouldn\'t happen'
         end
