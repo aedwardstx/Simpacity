@@ -1,4 +1,5 @@
 class Alert < ActiveRecord::Base
+  has_many :alert_logs
   belongs_to :contact_group
   belongs_to :link_type
 

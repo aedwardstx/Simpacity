@@ -13,6 +13,7 @@
       <th>Watermark</th>
       <th>Days Back</th>
       <th>Days Out</th>
+      <th>Severity</th>
       <th>Contact Group</th>
       <th></th>
     </tr>
@@ -31,6 +32,7 @@
         <td><%= alert.watermark %></td>
         <td><%= alert.days_back %></td>
         <td><%= alert.days_out %></td>
+        <td><%= alert.severity %></td>
         <td><%= alert.contact_group.name %></td>
         <td>
           <%= link_to 'Edit', edit_alert_path(alert), :class => 'btn btn-mini' %>

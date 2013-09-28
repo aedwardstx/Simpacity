@@ -22,7 +22,7 @@
     </div>
     <div class="field">
       <%= f.label :description %>
-      <%= f.text_field :description %>
+      <%= f.text_area :description %>
     </div>
     <div class="field">
       <%= f.label :int_type %>
@@ -53,6 +53,11 @@
       <%= f.label :days_out %>
       <%= f.number_field :days_out %>
     </div>
+    <p>
+      <%= f.label :severity, 'Severity:' %>
+      <%= f.text_field :severity, id: 'severity_amount', class: "input-small" %>
+      <div id="severity" style="max-width: 200px; margin: 10px;"></div>
+    </p>
     <div class="field">
       <%= f.label :contact_group_id %>
       <%= f.select :contact_group_id, ContactGroup.all.collect {|contact_group| [contact_group.name, contact_group.id]} %>
@@ -77,10 +82,25 @@ $(function () {
     });
     $("#watermark_amount").val($("#watermark").slider("value"));
 });
+$(function () {
+    $("#severity").slider({
+        value: <%= @alert.severity || 1 %>, 
+        min: 1,
+        max: 10,
+        step: 1,
+        slide: function (event, ui) {
+            $("#severity_amount").val(ui.value);
+        }
+    });
+    $("#severity_amount").val($("#severity").slider("value"));
+});
 
 
 $("#watermark_amount").change(function () {
     $("#watermark").slider('value', $("#watermark_amount").val());
+});
+$("#severity_amount").change(function () {
+    $("#severity").slider('value', $("#severity_amount").val());
 });
 </script>
 

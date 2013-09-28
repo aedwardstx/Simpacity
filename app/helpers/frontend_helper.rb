@@ -99,6 +99,31 @@ module FrontendHelper
     return times, gauges
   end
 
+  def get_int_average_rate(int_id, record)
+    client = MongoClient.new(Setting.first.mongodb_db_hostname, Setting.first.mongodb_db_port)
+    db     = client[Setting.first.mongodb_db_name]
+    recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
+    interface = Interface.find(int_id)
+    device = interface.device
+    hostname = device.hostname
+    collection = "host.#{hostname}"
+    int_measure_count = 0
+    int_measure_sum = 0
+
+    db[collection].find({'_id' => {:$gt => (Time.now.to_i - Setting.first.mongodb_test_window), :$lt => Time.now.to_i}}).each do |measurement|
+      if defined? measurement['rate'][interface.name][recordsToCollect[record]] and 
+          measurement['rate'][interface.name][recordsToCollect[record]].is_a? Integer
+        int_measure_count += 1 
+        int_measure_sum += measurement['rate'][interface.name][recordsToCollect[record]]
+      end
+    end
+    if not int_measure_count == 0 
+      return (int_measure_sum / int_measure_count * 8)
+    else
+      return 0
+    end
+  end
+
   def get_int_stats(int_id, percentile, record, start_epoch, end_epoch, watermark)
     (arrayOfX, arrayOfY) =  get_int_measurements(int_id, percentile, record, start_epoch, end_epoch)
     calc = SimpacityMath.new(1)
@@ -155,9 +180,19 @@ module FrontendHelper
       @charts[int.id]['interfaceName'] = int.name
       @charts[int.id]['bandwidth'] = int.bandwidth
       @charts[int.id]['interfaceLinkType'] = int.link_type.name
+      
+      #get alert info
+      @charts[int.id]['alerts']['severity'] = 0
+      if int.alert_logs.count > 0
+        int.alert_log.each do |alert_log|
+          @charts[int.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Rx/Tx Projection: #{alert_log.rx_projection}/#{alert_log.tx_projection}"
+          @charts[int.id]['alerts']['severity'] = alert_log.alert.severity if alert_log.alert.severity > @charts[int.id]['alerts']['severity']
+        end
+      end
+      
       records.each do |record|
-        (projection, average_rate, projection_start, projection_end) = get_int_stats(int.id, percentile, record, start_epoch, end_epoch, watermark)
-        @charts[int.id][record]['values']['projection'] = projection  
+        average_rate = get_int_average_rate(int.id, record)
+        #@charts[int.id][record]['values']['projection'] = projection  
         @charts[int.id][record]['values']['average_rate'] = average_rate
       end
     end

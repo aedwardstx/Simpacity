@@ -59,6 +59,6 @@ class AlertsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def alert_params
-      params.require(:alert).permit(:enabled, :name, :description, :int_type, :link_type_id, :match_regex, :percentile, :watermark, :days_out, :contact_group_id, :days_back)
+      params.require(:alert).permit(:enabled, :name, :description, :int_type, :link_type_id, :match_regex, :percentile, :watermark, :days_out, :contact_group_id, :days_back, :severity)
     end
 end

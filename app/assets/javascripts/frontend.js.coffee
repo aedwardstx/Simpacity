@@ -7,17 +7,16 @@ jQuery ->
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "sPaginationType": "bootstrap",
     "aoColumnDefs": [
-      { 'bSortable': false, 'aTargets': [ 8 ] }
+      { 'bSortable': false, 'aTargets': [ 7 ] }
     ],
     "aoColumns": [
       null,
       null,
       null,
       { "sType": "data-speed" },
-      null,
+      { "sType": "data-speed" },
       { "sType": "data-speed" },
       null,
-      { "sType": "data-speed" },
       null
     ]
   })
@@ -25,15 +24,14 @@ jQuery ->
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "sPaginationType": "bootstrap",
     "aoColumnDefs": [
-      { 'bSortable': false, 'aTargets': [ 6 ] }
+      { 'bSortable': false, 'aTargets': [ 5 ] }
     ]
     "aoColumns": [
       null,
       { "sType": "data-speed" },
-      null,
+      { "sType": "data-speed" },
       { "sType": "data-speed" },
       null,
-      { "sType": "data-speed" },
       null
     ]
   })

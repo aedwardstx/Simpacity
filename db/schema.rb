@@ -11,7 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130827145249) do
+ActiveRecord::Schema.define(version: 20130927170843) do
+
+  create_table "alert_logs", force: true do |t|
+    t.integer  "alert_id"
+    t.integer  "alertable_id"
+    t.string   "alertable_type"
+    t.datetime "tx_projection"
+    t.datetime "rx_projection"
+    t.boolean  "acknowledged"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "alerts", force: true do |t|
     t.boolean  "enabled"
@@ -27,6 +38,7 @@ ActiveRecord::Schema.define(version: 20130827145249) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "days_back"
+    t.integer  "severity"
   end
 
   create_table "contact_groups", force: true do |t|

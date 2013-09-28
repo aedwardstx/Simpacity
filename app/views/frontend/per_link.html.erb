@@ -36,10 +36,9 @@
       <th>Interface</th>
       <th>Link Type</th>
       <th>Bandwidth</th>
-      <th>Rx Projected</th>
       <th>Rx Average</th>
-      <th>Tx Projected</th>
       <th>Tx Average</th>
+      <th>Alert Severity</th>
       <th></th>
     </tr>
   </thead>
@@ -51,10 +50,9 @@
         <td><%= @charts[int_id]['interfaceName'] %></td>
         <td><%= @charts[int_id]['interfaceLinkType'] %></td>
         <td><%= number_to_human_size(@charts[int_id]['bandwidth'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
-        <td><%= @charts[int_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= number_to_human_size(@charts[int_id]['ifInOctets']['values']['average_rate'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
-        <td><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= number_to_human_size(@charts[int_id]['ifOutOctets']['values']['average_rate'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
+        <td><a id="severityPopover" href="#" data-content="<%= @charts[int_id]['alerts']['hoverList'] %>" rel="popover" data-placement="right" data-original-title="Triggered Alerts" data-trigger="hover"><%= @charts[int_id]['alerts']['severity'] %></a></td>
         <td><%= button_to_function "Chart it!", "chartit('#{@charts[int_id]['deviceHostname']}','#{@charts[int_id]['interfaceName']}',#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-mini" %></td>
       </tr>
     <% end %>
@@ -72,6 +70,8 @@
 <% end %>
 
 <script type="text/javascript" charset="utf-8">
+
+$('#severityPopover').popover();
 
 var options = {
     chart: {
