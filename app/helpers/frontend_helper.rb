@@ -196,9 +196,10 @@ module FrontendHelper
       
       #get alert info
       @charts[int.id]['alerts']['severity'] = 0
+      @charts[int.id]['alerts']['hoverList'] = []
       if int.alert_logs.count > 0
-        int.alert_log.each do |alert_log|
-          @charts[int.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Rx/Tx Projection: #{alert_log.rx_projection}/#{alert_log.tx_projection}"
+        int.alert_logs.each do |alert_log|
+          @charts[int.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Projection: #{alert_log.record}_#{alert_log.projection.to_date}"
           @charts[int.id]['alerts']['severity'] = alert_log.alert.severity if alert_log.alert.severity > @charts[int.id]['alerts']['severity']
         end
       end
@@ -229,9 +230,10 @@ module FrontendHelper
       end
       #get alert info
       @charts[int_group.id]['alerts']['severity'] = 0
+      @charts[int_group.id]['alerts']['hoverList'] = []
       if int_group.alert_logs.count > 0
-        int_group.alert_log.each do |alert_log|
-          @charts[int_group.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Rx/Tx Projection: #{alert_log.rx_projection}/#{alert_log.tx_projection}"
+        int_group.alert_logs.each do |alert_log|
+          @charts[int_group.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Projection: #{alert_log.record}_#{alert_log.projection.to_date}"
           @charts[int_group.id]['alerts']['severity'] = alert_log.alert.severity if alert_log.alert.severity > @charts[int_group.id]['alerts']['severity']
         end
       end

@@ -11,17 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130927170843) do
+ActiveRecord::Schema.define(version: 20130929182616) do
 
   create_table "alert_logs", force: true do |t|
     t.integer  "alert_id"
     t.integer  "alertable_id"
     t.string   "alertable_type"
-    t.datetime "tx_projection"
-    t.datetime "rx_projection"
     t.boolean  "acknowledged"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "projection"
+    t.string   "record"
   end
 
   create_table "alerts", force: true do |t|

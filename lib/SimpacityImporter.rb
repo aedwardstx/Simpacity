@@ -46,26 +46,22 @@ recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
 @db     = @client[Setting.first.mongodb_db_name]
 
 
-def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
+def getRawMeasurements(hostname, interface, recordName, starting_point_epoch, sliceSize)
   #Passed a hostname, interface, recordName, startTime, endTime
   #puts "getRawMeasurements DEBUG -- hostname=#{hostname},interface=#{interface},recordName=#{recordName},startTime=#{startTime},endTime=#{endTime}"
-  min_bps_for_inclusion = Setting.first.min_bps_for_inclusion
+  min_Bps_for_inclusion = Setting.first.min_bps_for_inclusion / 8 
   collection = "host.#{hostname}"
   xvals = Array.new
   yvals = Array.new
 
-  @db[collection].find({'_id' => {:$gt => startTime.to_i, :$lt => endTime.to_i}}).each do |measurement|
+  @db[collection].find({'_id' => {:$gt => startTime.to_i, :$lt => Time.now.to_i}, "rate.#{interface}.#{recordName}" => {:$gt => min_Bps_for_inclusion}}, :fields => "rate.#{interface}", :sort => ['_id', Mongo::ASCENDING], :limit => sliceSize).each do |measurement|
     if defined? measurement['rate'][interface][recordName] and measurement['rate'][interface][recordName].is_a? Integer
       gauge = measurement['rate'][interface][recordName] * 8  
-      if gauge >= min_bps_for_inclusion
-        #puts "line #{measurement['_id']} #{gauge}"
-        xvals << measurement['_id']
-        yvals << gauge
-      else
-        puts "Excluding measurement #{measurement['_id']}-#{hostname}-#{interface}-#{recordName}-#{gauge}"
-      end
+      #puts "line #{measurement['_id']} #{gauge}"
+      xvals << measurement['_id']
+      yvals << gauge
     else
-      puts "skipping as not defined"
+      puts "skipping measurement as not defined -- this should never really happen"
     end
   end
   return xvals, yvals
@@ -76,87 +72,45 @@ end
 #     This way, the script will cycle seperately for each measurement
 Interface.all.each do |int|
   puts "DEBUG -- interface=#{int.name},device=#{int.device.hostname}"
-  #find first day of data in mongo -- TODO, should not need a loop here, get rid of it
   bandwidth = int.bandwidth
   collection = "host.#{int.device.hostname}"
-  firstEntryRef = @db[collection].find.sort( [['_id', :asc]] ).first
-  firstEntryEpoch = firstEntryRef['_id']
 
-  #Get time of first sample
-  firstSampleTime = Time.at(firstEntryEpoch)
-
-  #Get time for yesterday at end of day and the start of the first sample day
-  yesterdayNow = Time.now-86400
-  yesterdayEndOfDay = yesterdayNow.change(:hour => 23, :min=> 59, :sec => 59)
-  firstSampleTimeMidnight = firstSampleTime.change(:hour => 0) # zero out hrs, mins, secs, usecs
-  #firstSampleTimeEndofday = firstSampletime.change(:hour => 23, :min => 59, :sec => 59) # zero out hrs, mins, secs, usecs
-
-  #Increment each day, starting with first sample day and ending with yesterday end of day
-  dayIncrement = firstSampleTimeMidnight
-  while dayIncrement < yesterdayEndOfDay
-    dayIncrementStart = dayIncrement.change(:hour => 0)
-    dayIncrement0600 = dayIncrement.change(:hour => 6)
-    dayIncrement1800 = dayIncrement.change(:hour => 18)
-    dayIncrementEnd = dayIncrement.change(:hour => 23, :min => 59, :sec => 59)
-    puts " DEBUG #{dayIncrement}, #{dayIncrementStart.to_i}, #{dayIncrementEnd.to_i}"
-
-    #foreach record to collect
-    recordsToCollect.each do |recordName,recordShortName|
-      sMath = SimpacityMath.new(sliceSize)
-      percentiles.each do |percentile|
-        #find existing measurements
-        ar_dayIncrement0600 = int.measurements.where(:collected_at => dayIncrement0600,
-                                                               :percentile => percentile, :record => recordName)
-        ar_dayIncrement1800 = int.measurements.where(:collected_at => dayIncrement1800,
-                                                               :percentile => percentile, :record => recordName)
-
-        #is the data already in AR for the day? 
-        if ((ar_dayIncrement0600.count == 1) and (ar_dayIncrement1800.count == 1))
-          #do nothing
-          puts "Doing nothing, #{int.name}, #{dayIncrement0600}, #{dayIncrement1800}, #{percentile}, #{recordName}"
-        else
-          #Clean up the entries if needed
-          ar_dayIncrement0600.destroy_all
-          ar_dayIncrement1800.destroy_all
-
-          if not sMath.valuesLoaded
-            #load the raw data for the day if not loaded already
-            (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordShortName, dayIncrementStart, dayIncrementEnd)
-            #puts "Debug"
-            #puts arrayOfX.inspect
-            #puts arrayOfY.inspect
-            sMath.loadValues(arrayOfX, arrayOfY)
-          end
-          if sMath.valuesLoaded 
-            sMath.findSIForPercentile(percentile)
-            sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
-            sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
-           
-            #This is a safe gaurd against the derived bandwidth being greater than the interface bandwidth.
-            #   This often happens for the first 12 hour datapoint as there is only partial information collected.
-            #   This problem will be more throughly addressed in the future.
-            sampleY0600 = bandwidth / 4 if sampleY0600 > bandwidth
-            sampleY1800 = bandwidth / 4 if sampleY1800 > bandwidth
-
-            puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
-            puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
-
-            #update record in AR
-            int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
-            int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
-          else
-            puts "Values missing for time period"
-          end
-        end
-        #unload findings from SimpacityMath
-        sMath.trashFindings
-      end
-      #nil all instance variables from sMath 
-      sMath.trashEverything
-    end
-
-    #Increment to the next day
-    dayIncrement += 86400
+  if defined? int.import_checkpoint
+    starting_point_epoch = int.import_checkpoint.to_i + 1
+    #go to the next interface if the measurements are too new or its the future
+    next if starting_point_epoch + (10 * Setting.first.polling_interval_secs * Setting.first.slice_size) > Time.now
+  else
+    firstEntryRef = @db[collection].find.sort( [['_id', :asc]] ).first
+    firstEntryEpoch = firstEntryRef['_id']
+    starting_point_epoch = firstEntryEpoch
   end
+
+  #foreach record to collect
+  recordsToCollect.each do |recordName,recordShortName|
+    sMath = SimpacityMath.new(sliceSize)
+    percentiles.each do |percentile|
+      #load the raw data for the day if not loaded already
+      (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordShortName, starting_point_epoch, sliceSize)
+      #puts arrayOfX.inspect
+      #puts arrayOfY.inspect
+      sMath.loadValues(arrayOfX, arrayOfY)
+      if sMath.valuesLoaded 
+        sMath.findSIForPercentile(percentile)
+        sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
+       
+        puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
+
+        #update record in AR
+        int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
+      else
+        puts "Values missing for time period"
+      end
+      #unload findings from SimpacityMath
+      sMath.trashFindings
+    end
+    #nil all instance variables from sMath 
+    sMath.trashEverything
+  end
+
 end
 
