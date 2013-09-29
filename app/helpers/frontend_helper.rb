@@ -99,26 +99,39 @@ module FrontendHelper
     return times, gauges
   end
 
-  def get_int_average_rate(int_id, record)
-    client = MongoClient.new(Setting.first.mongodb_db_hostname, Setting.first.mongodb_db_port)
-    db     = client[Setting.first.mongodb_db_name]
-    recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
-    interface = Interface.find(int_id)
-    device = interface.device
-    hostname = device.hostname
-    collection = "host.#{hostname}"
-    int_measure_count = 0
-    int_measure_sum = 0
+  def get_int_group_average_rate(int_group_id, record)
+    interface_group = InterfaceGroup.find(int_group_id)
 
-    db[collection].find({'_id' => {:$gt => (Time.now.to_i - Setting.first.mongodb_test_window), :$lt => Time.now.to_i}}).each do |measurement|
-      if defined? measurement['rate'][interface.name][recordsToCollect[record]] and 
-          measurement['rate'][interface.name][recordsToCollect[record]].is_a? Integer
-        int_measure_count += 1 
-        int_measure_sum += measurement['rate'][interface.name][recordsToCollect[record]]
-      end
+    measure_count = 0
+    measure_sum = 0
+    #TODO -- move average calc percentile and days back to general settings
+    measurements = interface_group.srlg_measurement.where(:record => record, :percentile => 100, :collected_at => 5.day.ago..Time.now)
+    measurements.each do |measures|
+      measure_sum += measures.gauge
+      measure_count += 1
     end
-    if not int_measure_count == 0 
-      return (int_measure_sum / int_measure_count * 8)
+
+    if not measure_count == 0 
+      return (measure_sum / measure_count)
+    else
+      return 0
+    end
+  end
+
+  def get_int_average_rate(int_id, record)
+    interface = Interface.find(int_id)
+
+    measure_count = 0
+    measure_sum = 0
+    #TODO -- move average calc percentile and days back to general settings
+    measurements = interface.measurements.where(:record => record, :percentile => 100, :collected_at => 5.day.ago..Time.now)
+    measurements.each do |measures|
+      measure_sum += measures.gauge
+      measure_count += 1
+    end
+
+    if not measure_count == 0 
+      return (measure_sum / measure_count)
     else
       return 0
     end
@@ -210,10 +223,19 @@ module FrontendHelper
       @charts[int_group.id]['int_group_name'] = int_group.name
       @charts[int_group.id]['bandwidth'] = get_int_group_bandwidth(int_group.id)
       records.each do |record|
-        (projection, average_rate, projection_start, projection_end) = get_int_group_stats(int_group.id, percentile, record, start_epoch, end_epoch, watermark)
-        @charts[int_group.id][record]['values']['projection'] = projection  
+        average_rate = get_int_group_average_rate(int_group.id, record)
+        #@charts[int_group.id][record]['values']['projection'] = projection  
         @charts[int_group.id][record]['values']['average_rate'] = average_rate
       end
+      #get alert info
+      @charts[int_group.id]['alerts']['severity'] = 0
+      if int_group.alert_logs.count > 0
+        int_group.alert_log.each do |alert_log|
+          @charts[int_group.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Rx/Tx Projection: #{alert_log.rx_projection}/#{alert_log.tx_projection}"
+          @charts[int_group.id]['alerts']['severity'] = alert_log.alert.severity if alert_log.alert.severity > @charts[int_group.id]['alerts']['severity']
+        end
+      end
+      
     end
     return @charts
   end

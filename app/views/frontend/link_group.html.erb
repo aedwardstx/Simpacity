@@ -33,10 +33,9 @@
     <tr>
       <th>Interface Group</th>
       <th>Bandwidth</th>
-      <th>Rx Projected</th>
       <th>Rx Average</th>
-      <th>Tx Projected</th>
       <th>Tx Average</th>
+      <th>Alert Severity</th>
       <th></th>
     </tr>
   </thead>
@@ -46,10 +45,9 @@
       <tr>
         <td><%= @charts[ig_id]['int_group_name'] %></td>
         <td><%= number_to_human_size(@charts[ig_id]['bandwidth'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
-        <td><%= @charts[ig_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= number_to_human_size(@charts[ig_id]['ifInOctets']['values']['average_rate'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
-        <td><%= @charts[ig_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></td>
         <td><%= number_to_human_size(@charts[ig_id]['ifOutOctets']['values']['average_rate'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
+        <td><a id="severityPopover" href="#" data-content="<%= @charts[ig_id]['alerts']['hoverList'] %>" rel="popover" data-placement="right" data-original-title="Triggered Alerts" data-trigger="hover"><%= @charts[ig_id]['alerts']['severity'] %></a></td>
         <td><%= button_to_function "Chart it!", "chartit('#{@charts[ig_id]['int_group_name']}',#{ig_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-mini" %></td>
       </tr>
     <% end %>
@@ -60,7 +58,7 @@
 
 <% content_for :sidebar do %>
   <h4>Information</h4>
-  All information on this page reflects the scope of the parameters provided. </br>
+  All graphing information on this page reflects the scope of the parameters provided. </br>
   <b>Historical Distance in Days:</b> In aggregating the statistics for display on this page, how many days back should be examined. </br>
   <b>Percentile:</b> Statistics are generated primarily by walking the measurements gathered from the devices in blocks of 100.  Percentile: controls the top X number of measurements that are taken into consideration when generating statistics.  99th = Top 1 measurements per 100 collected, 75th = Top 25 measurements per 100 collected, etc.</br>
   <b>High Watermark:</b> Controls what to consider a fully loaded link.  Range 0.001 -- 1.000 e.g. 0.40 would be 40% of bandwidth </br>

@@ -127,23 +127,26 @@ Interface.all.each do |int|
             #puts arrayOfY.inspect
             sMath.loadValues(arrayOfX, arrayOfY)
           end
-          
-          sMath.findSIForPercentile(percentile)
-          sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
-          sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
-         
-          #This is a safe gaurd against the derived bandwidth being greater than the interface bandwidth.
-          #   This often happens for the first 12 hour datapoint as there is only partial information collected.
-          #   This problem will be more throughly addressed in the future.
-          sampleY0600 = bandwidth / 4 if sampleY0600 > bandwidth
-          sampleY1800 = bandwidth / 4 if sampleY1800 > bandwidth
+          if sMath.valuesLoaded 
+            sMath.findSIForPercentile(percentile)
+            sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
+            sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
+           
+            #This is a safe gaurd against the derived bandwidth being greater than the interface bandwidth.
+            #   This often happens for the first 12 hour datapoint as there is only partial information collected.
+            #   This problem will be more throughly addressed in the future.
+            sampleY0600 = bandwidth / 4 if sampleY0600 > bandwidth
+            sampleY1800 = bandwidth / 4 if sampleY1800 > bandwidth
 
-          puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
-          puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
+            puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
+            puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
 
-          #update record in AR
-          int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
-          int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
+            #update record in AR
+            int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
+            int.measurements.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
+          else
+            puts "Values missing for time period"
+          end
         end
         #unload findings from SimpacityMath
         sMath.trashFindings

@@ -153,23 +153,25 @@ InterfaceGroup.all.each do |int_group|
             #aggregate all the figures -- TODO PERFORMANCE benchmark(0.16-0.25) 
             sMath.aggregateGroupValues(window) 
           end
+          if sMath.valuesLoaded
 
-          #call simacityMath
-          sMath.findSIForPercentile(percentile)
-          sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
-          sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
+            #call simacityMath
+            sMath.findSIForPercentile(percentile)
+            sampleY0600 = sMath.getYGivenX(dayIncrement0600.to_i)
+            sampleY1800 = sMath.getYGivenX(dayIncrement1800.to_i)
 
-          #This is a safe gaurd against the derived bandwidth being greater than the interface bandwidth.
-          #   This often happens for the first 12 hour datapoint as there is only partial information collected.
-          #   This problem will be more throughly addressed in the future.
-          sampleY0600 = bandwidth / 4 if sampleY0600 > bandwidth
-          sampleY1800 = bandwidth / 4 if sampleY1800 > bandwidth
-    
-          #update record in AR
-          puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
-          int_group.srlg_measurement.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
-          puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
-          int_group.srlg_measurement.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
+            #This is a safe gaurd against the derived bandwidth being greater than the interface bandwidth.
+            #   This often happens for the first 12 hour datapoint as there is only partial information collected.
+            #   This problem will be more throughly addressed in the future.
+            sampleY0600 = bandwidth / 4 if sampleY0600 > bandwidth
+            sampleY1800 = bandwidth / 4 if sampleY1800 > bandwidth
+      
+            #update record in AR
+            puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement0600},gauge=#{sampleY0600}"
+            int_group.srlg_measurement.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement0600, :gauge => sampleY0600)
+            puts "Debug -- insert into AR - record=#{recordName},percentile=#{percentile},collected_at=#{dayIncrement1800},gauge=#{sampleY1800}"
+            int_group.srlg_measurement.create(:record => recordName, :percentile => percentile, :collected_at => dayIncrement1800, :gauge => sampleY1800)
+          end
         end
       end
       sMath.trashEverything

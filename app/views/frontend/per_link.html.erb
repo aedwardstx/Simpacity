@@ -118,7 +118,7 @@ function chartit( dev_hostname, int_name, int_id, watermark, percentile, start_e
       name: 'High Watermark',
       data: json['watermark']
     }];
-    options.title = { text: dev_hostname + ":" + int_name }
+    options.title = { text: dev_hostname + "_" + int_name }
     var chart = new Highcharts.Chart(options);
     chart.series[6].hide()
   });
