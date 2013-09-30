@@ -26,7 +26,7 @@ module FrontendHelper
       #TODO -- abstarct the number of future days to graph a projection into general settings
       last_projection_point_x = (last_record_point_x / 1000) + (84600 * 30)
 
-      (projection,average_rate,projection_start,projection_end) = get_int_stats(int_id, percentile, record, first_projection_point_x, last_projection_point_x, watermark)
+      (projection,average_rate,projection_start,projection_end) = get_int_stats2(int_id, percentile, arrayOfX, arrayOfY, first_projection_point_x, last_projection_point_x, watermark)
       @chart[record]['stats']['average_rate'] = [[first_record_point_x,average_rate],[last_record_point_x,average_rate]]
       @chart[record]['stats']['projection'] = [[first_projection_point_x * 1000,projection_start],[last_projection_point_x * 1000,projection_end]] 
       @chart['watermark'] = [[first_record_point_x,watermark * bandwidth],[last_projection_point_x * 1000,watermark * bandwidth]] 
@@ -61,7 +61,7 @@ module FrontendHelper
       #TODO -- abstarct the number of future days to graph a projection into general settings
       last_projection_point_x = (last_record_point_x / 1000) + (84600 * 30)
 
-      (projection,average_rate,projection_start,projection_end) = get_int_group_stats(int_group_id, percentile, record, first_projection_point_x, last_projection_point_x, watermark)
+      (projection,average_rate,projection_start,projection_end) = get_int_group_stats2(int_group_id, percentile, arrayOfX, arrayOfY, first_projection_point_x, last_projection_point_x, watermark)
       @chart[record]['stats']['average_rate'] = [[first_record_point_x,average_rate],[last_record_point_x,average_rate]]
       @chart[record]['stats']['projection'] = [[first_projection_point_x * 1000,projection_start],[last_projection_point_x * 1000,projection_end]] 
       @chart['watermark'] = [[first_record_point_x,watermark * bandwidth],[last_projection_point_x * 1000,watermark * bandwidth]] 
@@ -105,7 +105,7 @@ module FrontendHelper
     measure_count = 0
     measure_sum = 0
     #TODO -- move average calc percentile and days back to general settings
-    measurements = interface_group.srlg_measurement.where(:record => record, :percentile => 100, :collected_at => 1.day.ago..Time.now)
+    measurements = interface_group.srlg_measurement.where(:record => record, :percentile => 100, :collected_at => 36.hours.ago..Time.now)
     measurements.each do |measures|
       measure_sum += measures.gauge
       measure_count += 1
@@ -124,7 +124,7 @@ module FrontendHelper
     measure_count = 0
     measure_sum = 0
     #TODO -- move average calc percentile and days back to general settings
-    measurements = interface.measurements.where(:record => record, :percentile => 100, :collected_at => 1.day.ago..Time.now)
+    measurements = interface.measurements.where(:record => record, :percentile => 100, :collected_at => 36.hours.ago..Time.now)
     measurements.each do |measures|
       measure_sum += measures.gauge
       measure_count += 1
@@ -135,6 +135,24 @@ module FrontendHelper
     else
       return 0
     end
+  end
+
+  def get_int_stats2(int_id, percentile, arrayOfX, arrayOfY, start_epoch, end_epoch, watermark)
+    calc = SimpacityMath.new(1)
+    if calc.loadValues(arrayOfX, arrayOfY)
+      interface = Interface.find(int_id)
+      bandwidth = interface.bandwidth
+      projection = calc.projectDepletion(watermark, bandwidth, percentile, (86400 * Setting.first.max_trending_future_days))
+      projection = (projection - (Time.now.to_i)) / 86400 
+      average_rate = calc.getAverageRate
+      projection_start = calc.getYGivenX(start_epoch) 
+      projection_end = calc.getYGivenX(end_epoch) 
+      calc.trashEverything #trashes everything
+    else
+      projection = average_rate = projection_start = projection_end = 0
+    end
+
+    return projection, average_rate, projection_start, projection_end
   end
 
   def get_int_stats(int_id, percentile, record, start_epoch, end_epoch, watermark)
@@ -158,6 +176,23 @@ module FrontendHelper
 
   def get_int_group_stats(int_group_id, percentile, record, start_epoch, end_epoch, watermark)
     (arrayOfX, arrayOfY) =  get_int_group_measurements(int_group_id, percentile, record, start_epoch, end_epoch)
+    calc = SimpacityMath.new(1)
+    if calc.loadValues(arrayOfX, arrayOfY)
+      bandwidth = get_int_group_bandwidth(int_group_id)
+      projection = calc.projectDepletion(watermark, bandwidth, percentile, (86400 * Setting.first.max_trending_future_days))
+      projection = (projection - (Time.now.to_i)) / 86400 
+      average_rate = calc.getAverageRate
+      projection_start = calc.getYGivenX(start_epoch) 
+      projection_end = calc.getYGivenX(end_epoch) 
+      calc.trashEverything #trashes everything
+    else
+      projection = average_rate = projection_start = projection_end = 0
+    end
+
+    return projection, average_rate, projection_start, projection_end
+  end
+
+  def get_int_group_stats2(int_group_id, percentile, arrayOfX, arrayOfY, start_epoch, end_epoch, watermark)
     calc = SimpacityMath.new(1)
     if calc.loadValues(arrayOfX, arrayOfY)
       bandwidth = get_int_group_bandwidth(int_group_id)

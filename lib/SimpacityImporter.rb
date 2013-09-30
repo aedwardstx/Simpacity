@@ -78,9 +78,17 @@ Interface.all.each do |int|
           arrayOfX_sum += x
         end
         sampleX = arrayOfX_sum / arrayOfX.length
-
+        arrayOfX_count = arrayOfX.count
+        #puts "#{arrayOfX_count}/#{arrayOfY.count}"
         percentiles.each do |percentile|
-          sampleY = arrayOfY.sort[-percentile..-1].inject{ |sum, element| sum + element }.to_f / percentile 
+          
+          #In order to keep the sort target from returning nil, have to handle the percentile averaging differently
+          if arrayOfX_count < percentile #percentile is larger than arrayOfX_count
+            sampleY = arrayOfY.inject{ |sum, element| sum + element }.to_f / arrayOfX_count
+          else #percentile is less than or equal to arrayOfX_count
+            sampleY = arrayOfY.sort[-percentile..-1].inject{ |sum, element| sum + element }.to_f / percentile 
+          end
+
           puts "Debug -- insert into AR - hostname=#{int.device.hostname},interface=#{int.name},record=#{recordName},percentile=#{percentile},collected_at=#{sampleX},gauge=#{sampleY}"
 
           #update records in AR

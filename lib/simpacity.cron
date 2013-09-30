@@ -1,6 +1,7 @@
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/rvm/bin
 
-10 0 * * * root ruby /opt/simpacity-dev/lib/SimpacityAutodiscover.rb >> /opt/simpacity-dev/log/SimpacityAutodiscovery.log
-30 0 * * * root ruby /opt/simpacity-dev/lib/SimpacityOddjob.rb >> /opt/simpacity-dev/log/SimpacityOddjob.log
-50 0 * * * root ruby /opt/simpacity-dev/lib/SimpacityImporter.rb >> /opt/simpacity-dev/log/SimpacityImporter.log
-10 3 * * * root ruby /opt/simpacity-dev/lib/SimpacitySRLGImporter.rb >> /opt/simpacity-dev/log/SimpacitySRLGImporter.log
+#10 0 * * * root ruby /opt/simpacity-dev/lib/SimpacityAutodiscover.rb >> /opt/simpacity-dev/log/SimpacityAutodiscovery.log
+30 6 * * * root ruby /opt/simpacity-dev/lib/SimpacityOddjob.rb >> /opt/simpacity-dev/log/SimpacityOddjob.log
+50 6 * * * root ruby /opt/simpacity-dev/lib/SimpacityImporter.rb >> /opt/simpacity-dev/log/SimpacityImporter.log
+10 9 * * * root ruby /opt/simpacity-dev/lib/SimpacitySRLGImporter.rb >> /opt/simpacity-dev/log/SimpacitySRLGImporter.log
+10 12 * * * root ruby /opt/simpacity-dev/lib/SimpacityAlerter.rb >> /opt/simpacity-dev/log/SimpacityAlerter.log

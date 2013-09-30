@@ -1,13 +1,5 @@
 #!/usr/bin/env ruby
 
-#Flow
-#walk the configured alerts and email the contact group associated if needed
-#
-#
-#TODO
-#need to add a minimum data-points requirement to avoid an alert being generated prematurely
-
-
 require 'rubygems'
 require 'mongo'
 include Mongo
@@ -63,13 +55,18 @@ Alert.all.each do |alert|
             measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
             alert_lookback_duration = end_epoch - start_epoch
 
-            #skip this alert if we dont think there will be enough measurements
             puts "Debug measurements length #{measurement_duration_sec} #{min_alert_measurements_percent * alert_lookback_duration}"
-            next if measurement_duration_sec < (min_alert_measurements_percent * alert_lookback_duration) 
 
             projection = get_int_projection(int.id, alert.percentile, recordName, start_epoch, end_epoch, alert.watermark, Setting.first.max_trending_future_days)
             puts projection.inspect
-            if projection <= alert.days_out
+            
+            #skip this alert if we are not already in an exhaustion situation and we dont think there will be enough measurements
+            if projection > 1 and measurement_duration_sec < (min_alert_measurements_percent * alert_lookback_duration)
+              puts "Skipping as there is not enough data"
+              #if there is an alert for this already, delete it
+              int.alert_logs.where(:record => recordName, :alert_id => alert.id).destroy_all
+              next
+            elsif projection <= alert.days_out
               #generate alert
               puts "Alert fired for Alert.name: #{alert.name}, Int.id: #{int.id}, Int.device.hostname: #{int.device.hostname}, Int.name: #{int.name}, Record: #{recordName}, Projection: #{projection}"
               alert_log_entry = int.alert_logs.where(:record => recordName, :alert_id => alert.id).first
@@ -78,6 +75,9 @@ Alert.all.each do |alert|
               else
                 int.alert_logs.create(:record => recordName, :projection => projection.days.from_now, :alert_id => alert.id)
               end
+            else
+              #if there is an alert for this already, delete it
+              int.alert_logs.where(:record => recordName, :alert_id => alert.id).destroy_all
             end
           end
         end
@@ -91,13 +91,17 @@ Alert.all.each do |alert|
           measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
           alert_lookback_duration = end_epoch - start_epoch
 
-          #skip this alert if we dont think there will be enough measurements
-          puts "Debug measurements length #{measurement_duration_sec} #{min_alert_measurements_percent * alert_lookback_duration}"
-          next if measurement_duration_sec < (min_alert_measurements_percent * alert_lookback_duration) 
-
           projection = get_int_group_projection(int_group.id, alert.percentile, recordName, start_epoch, end_epoch, alert.watermark, Setting.first.max_trending_future_days)
           puts projection.inspect
-          if projection <= alert.days_out
+
+          puts "Debug measurements length #{measurement_duration_sec} #{min_alert_measurements_percent * alert_lookback_duration}"
+          #skip this alert if we are not already in an exhaustion situation and we dont think there will be enough measurements
+          if projection > 1 and measurement_duration_sec < (min_alert_measurements_percent * alert_lookback_duration)
+            puts "Skipping as there is not enough data"
+            #if there is an alert for this already, delete it
+            int_group.alert_logs.where(:record => recordName, :alert_id => alert.id).destroy_all
+            next
+          elsif projection <= alert.days_out
             #generate alert
             puts "Alert fired for Alert.name: #{alert.name}, Int_group.id: #{int_group.id}, Int_group.device.hostname: #{int_group.device.hostname}, Int_group.name: #{int_group.name}, Record: #{recordName}, Projection: #{projection}"
             alert_log_entry = int_group.alert_logs.where(:record => recordName, :alert_id => alert.id).first
@@ -106,6 +110,9 @@ Alert.all.each do |alert|
             else
               int_group.alert_logs.create(:record => recordName, :projection => projection.days.from_now, :alert_id => alert.id)
             end
+          else
+            #if there is an alert for this already, delete it
+            int_group.alert_logs.where(:record => recordName, :alert_id => alert.id).destroy_all
           end
         end
       end
