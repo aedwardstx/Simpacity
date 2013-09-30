@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  alert_id: 1
+  tx_projection: 2013-09-27 17:08:43
+  rx_projection: 2013-09-27 17:08:43
+  acknowledged: 
+
+two:
+  alert_id: 1
+  tx_projection: 2013-09-27 17:08:43
+  rx_projection: 2013-09-27 17:08:43
+  acknowledged: 

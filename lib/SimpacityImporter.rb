@@ -52,13 +52,8 @@ def getRawMeasurements(hostname, interface, recordName, starting_point_epoch, sl
   return xvals, yvals
 end
 
-#TODO -- I think the structure should be changed slightly here,     ---- maybe a studip ideeea
-#     change from per-day,per-record,per-percentile  to  per-record,per-day,per-percentile
-#     This way, the script will cycle seperately for each measurement
 Interface.all.each do |int|
   puts "DEBUG -- interface=#{int.name},device=#{int.device.hostname}"
-  bandwidth = int.bandwidth
-  collection = "host.#{int.device.hostname}"
 
   loop do
     if defined? int.import_checkpoint
@@ -66,9 +61,7 @@ Interface.all.each do |int|
       #go to the next interface if the measurements are too new or its the future
       break if starting_point_epoch + (10 * @polling_interval_secs * sliceSize) > Time.now.to_i
     else
-      firstEntryRef = @db[collection].find.sort( [['_id', :asc]] ).first
-      firstEntryEpoch = firstEntryRef['_id']
-      starting_point_epoch = firstEntryEpoch
+      starting_point_epoch = 1
     end
 
     write_checkpoint = 0

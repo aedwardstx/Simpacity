@@ -97,6 +97,10 @@ class SimpacityMath
     end
   end
 
+  def getRawVals
+    return @xvals, @yvals
+  end
+
   def arrayValuesCheck(xvalsLength,yvalsLength)
     if not xvalsLength==yvalsLength
       #abort("The X and Y array lengths are not the same!")
