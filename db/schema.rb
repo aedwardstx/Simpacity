@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130929182616) do
+ActiveRecord::Schema.define(version: 20130929231653) do
 
   create_table "alert_logs", force: true do |t|
     t.integer  "alert_id"
@@ -87,6 +87,7 @@ ActiveRecord::Schema.define(version: 20130929182616) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "refresh_next_import"
+    t.datetime "import_checkpoint"
   end
 
   create_table "interfaces", force: true do |t|
@@ -96,7 +97,8 @@ ActiveRecord::Schema.define(version: 20130929182616) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "link_type_id"
-    t.integer  "bandwidth",    limit: 8
+    t.integer  "bandwidth",         limit: 8
+    t.datetime "import_checkpoint"
   end
 
   create_table "link_types", force: true do |t|

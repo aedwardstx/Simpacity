@@ -105,7 +105,7 @@ module FrontendHelper
     measure_count = 0
     measure_sum = 0
     #TODO -- move average calc percentile and days back to general settings
-    measurements = interface_group.srlg_measurement.where(:record => record, :percentile => 100, :collected_at => 5.day.ago..Time.now)
+    measurements = interface_group.srlg_measurement.where(:record => record, :percentile => 100, :collected_at => 1.day.ago..Time.now)
     measurements.each do |measures|
       measure_sum += measures.gauge
       measure_count += 1
@@ -124,7 +124,7 @@ module FrontendHelper
     measure_count = 0
     measure_sum = 0
     #TODO -- move average calc percentile and days back to general settings
-    measurements = interface.measurements.where(:record => record, :percentile => 100, :collected_at => 5.day.ago..Time.now)
+    measurements = interface.measurements.where(:record => record, :percentile => 100, :collected_at => 1.day.ago..Time.now)
     measurements.each do |measures|
       measure_sum += measures.gauge
       measure_count += 1
