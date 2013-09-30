@@ -1,5 +1,5 @@
 class Alert < ActiveRecord::Base
-  has_many :alert_logs
+  has_many :alert_logs, :dependent => :destroy
   belongs_to :contact_group
   belongs_to :link_type
 

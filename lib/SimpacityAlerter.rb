@@ -58,11 +58,11 @@ Alert.all.each do |alert|
             puts "Debug measurements length #{measurement_duration_sec} #{min_alert_measurements_percent * alert_lookback_duration}"
 
             projection = get_int_projection(int.id, alert.percentile, recordName, start_epoch, end_epoch, alert.watermark, Setting.first.max_trending_future_days)
-            puts projection.inspect
+            #puts projection.inspect
             
             #skip this alert if we are not already in an exhaustion situation and we dont think there will be enough measurements
             if projection > 1 and measurement_duration_sec < (min_alert_measurements_percent * alert_lookback_duration)
-              puts "Skipping as there is not enough data"
+              puts "Skipping as there is not enough data: #{int.device.hostname}_#{int.name}, #{projection} days"
               #if there is an alert for this already, delete it
               int.alert_logs.where(:record => recordName, :alert_id => alert.id).destroy_all
               next
@@ -92,12 +92,12 @@ Alert.all.each do |alert|
           alert_lookback_duration = end_epoch - start_epoch
 
           projection = get_int_group_projection(int_group.id, alert.percentile, recordName, start_epoch, end_epoch, alert.watermark, Setting.first.max_trending_future_days)
-          puts projection.inspect
+          #puts projection.inspect
 
           puts "Debug measurements length #{measurement_duration_sec} #{min_alert_measurements_percent * alert_lookback_duration}"
           #skip this alert if we are not already in an exhaustion situation and we dont think there will be enough measurements
           if projection > 1 and measurement_duration_sec < (min_alert_measurements_percent * alert_lookback_duration)
-            puts "Skipping as there is not enough data"
+            puts "Skipping as there is not enough data: #{int_group.name}, #{projection} days"
             #if there is an alert for this already, delete it
             int_group.alert_logs.where(:record => recordName, :alert_id => alert.id).destroy_all
             next
