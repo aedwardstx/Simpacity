@@ -7,6 +7,7 @@ class Interface < ActiveRecord::Base
   belongs_to :device
   belongs_to :link_type
   has_many :alert_logs, as: :alertable, :dependent => :destroy
+  has_many :averages, as: :averageable, :dependent => :destroy
   #has_many :alerts, :through :alert_logs
   has_many :interface_groups, :through => :interface_group_relationships
   has_many :interface_group_relationships, :dependent => :destroy

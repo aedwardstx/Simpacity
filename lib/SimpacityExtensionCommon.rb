@@ -39,6 +39,7 @@ require "#{simpacity_base}/app/models/contact_group.rb"
 require "#{simpacity_base}/app/models/device_autoconf_rule.rb"
 require "#{simpacity_base}/app/models/interface_autoconf_rule.rb"
 require "#{simpacity_base}/app/models/link_type.rb"
+require "#{simpacity_base}/app/models/average.rb"
 
 
 #Require some helpers

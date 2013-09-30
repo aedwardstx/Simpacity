@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130929231653) do
+ActiveRecord::Schema.define(version: 20130930181802) do
 
   create_table "alert_logs", force: true do |t|
     t.integer  "alert_id"
@@ -39,6 +39,16 @@ ActiveRecord::Schema.define(version: 20130929231653) do
     t.datetime "updated_at"
     t.integer  "days_back"
     t.integer  "severity"
+  end
+
+  create_table "averages", force: true do |t|
+    t.integer  "averageable_id"
+    t.string   "averageable_type"
+    t.string   "record"
+    t.integer  "percentile"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "gauge",            limit: 8
   end
 
   create_table "contact_groups", force: true do |t|

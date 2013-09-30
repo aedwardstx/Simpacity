@@ -240,7 +240,8 @@ module FrontendHelper
       end
       
       records.each do |record|
-        average_rate = get_int_average_rate(int.id, record)
+        average_rate = int.averages.where(:percentile => percentile, :record => record).first.gauge
+        #average_rate = get_int_average_rate(int.id, record)
         #@charts[int.id][record]['values']['projection'] = projection  
         @charts[int.id][record]['values']['average_rate'] = average_rate
       end
@@ -259,7 +260,8 @@ module FrontendHelper
       @charts[int_group.id]['int_group_name'] = int_group.name
       @charts[int_group.id]['bandwidth'] = get_int_group_bandwidth(int_group.id)
       records.each do |record|
-        average_rate = get_int_group_average_rate(int_group.id, record)
+        average_rate = int_group.averages.where(:percentile => percentile, :record => record).first.gauge
+        #average_rate = get_int_group_average_rate(int_group.id, record)
         #@charts[int_group.id][record]['values']['projection'] = projection  
         @charts[int_group.id][record]['values']['average_rate'] = average_rate
       end

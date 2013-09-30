@@ -1,5 +1,6 @@
 class InterfaceGroup < ActiveRecord::Base
   has_many :alert_logs, as: :alertable, :dependent => :destroy
+  has_many :averages, as: :averageable, :dependent => :destroy
   #has_many :alerts, :through :alert_logs
   has_many :interfaces, :through => :interface_group_relationships 
   has_many :interface_group_relationships, :dependent => :destroy

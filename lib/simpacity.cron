@@ -5,3 +5,4 @@ PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games:/usr/local/sbin:/usr/s
 50 6 * * * root ruby /opt/simpacity-dev/lib/SimpacityImporter.rb >> /opt/simpacity-dev/log/SimpacityImporter.log
 10 9 * * * root ruby /opt/simpacity-dev/lib/SimpacitySRLGImporter.rb >> /opt/simpacity-dev/log/SimpacitySRLGImporter.log
 10 12 * * * root ruby /opt/simpacity-dev/lib/SimpacityAlerter.rb >> /opt/simpacity-dev/log/SimpacityAlerter.log
+0 * * * * root ruby /opt/simpacity-dev/lib/SimpacityAverager.rb >> /opt/simpacity-dev/log/SimpacityAverager.log
