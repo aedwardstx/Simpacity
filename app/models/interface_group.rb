@@ -15,7 +15,9 @@ class InterfaceGroup < ActiveRecord::Base
   validates_uniqueness_of :name
   validates_presence_of :name
   validates_presence_of :description
-  validates_presence_of :interface_ids  #This does not completely work, highlighting is busted, highlighting works when reffering to interface_tokens but is otherwise busted
+
+  #removed because there are use cases for creating link-groups as placeholders without interfaces associated
+  #validates_presence_of :interface_ids  #This does not completely work, highlighting is busted, highlighting works when reffering to interface_tokens but is otherwise busted
   #TODO -- validate the existance of the interface_ids specified
 
 end

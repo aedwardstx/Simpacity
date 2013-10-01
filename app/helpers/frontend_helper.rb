@@ -260,10 +260,13 @@ module FrontendHelper
       @charts[int_group.id]['int_group_name'] = int_group.name
       @charts[int_group.id]['bandwidth'] = get_int_group_bandwidth(int_group.id)
       records.each do |record|
-        average_rate = int_group.averages.where(:percentile => percentile, :record => record).first.gauge
-        #average_rate = get_int_group_average_rate(int_group.id, record)
-        #@charts[int_group.id][record]['values']['projection'] = projection  
-        @charts[int_group.id][record]['values']['average_rate'] = average_rate
+        first_element = int_group.averages.where(:percentile => percentile, :record => record).first
+        if first_element
+          average_rate = first_element.gauge
+          #average_rate = get_int_group_average_rate(int_group.id, record)
+          #@charts[int_group.id][record]['values']['projection'] = projection  
+          @charts[int_group.id][record]['values']['average_rate'] = average_rate
+        end
       end
       #get alert info
       @charts[int_group.id]['alerts']['severity'] = 0

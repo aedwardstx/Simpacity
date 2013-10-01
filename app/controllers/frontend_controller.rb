@@ -61,7 +61,7 @@ class FrontendController < ApplicationController
     if params[:hd_to]
       end_time = Time.strptime(params[:hd_to], "%m/%d/%Y")
     else
-      end_time = Time.now - 1.day 
+      end_time = Time.now 
     end
     end_time = end_time.change(:hour => 23, :min=> 59, :sec => 59)
     end_epoch = end_time.to_i 

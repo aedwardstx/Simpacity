@@ -34,7 +34,7 @@ $(function() {
     $( "#hd_from" ).datepicker({
       changeMonth: true,
       numberOfMonths: 1,
-      maxDate: "-1d",
+      maxDate: "0d",
       minDate: "-90d",
       onClose: function() {
         var date = $(this).datepicker('getDate');
@@ -47,7 +47,7 @@ $(function() {
     $( "#hd_to" ).datepicker({
       changeMonth: true,
       numberOfMonths: 1,
-      maxDate: "-1d",
+      maxDate: "0d",
       minDate: "-90d",
       onClose: function() {
         var date = $(this).datepicker('getDate');

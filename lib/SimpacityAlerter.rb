@@ -40,6 +40,7 @@ Alert.all.each do |alert|
   start_time = now - (alert.days_back * 86400)
   start_time = start_time.change(:hour => 0)
   start_epoch = start_time.to_i
+  puts "Alert #{alert.name}, #{alert.int_type}, #{alert.link_type.name}, #{alert.match_regex}, #{alert.percentile}, #{alert.watermark}, days_out: #{alert.days_out}, days_back:#{alert.days_back}"
 
   #puts "Debug #{start_epoch} - #{end_epoch} #{alert.inspect}"
   #puts alert.inspect
@@ -55,20 +56,20 @@ Alert.all.each do |alert|
             measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
             alert_lookback_duration = end_epoch - start_epoch
 
-            puts "Debug measurements length #{measurement_duration_sec} #{min_alert_measurements_percent * alert_lookback_duration}"
+            puts "  Debug measurements length #{measurement_duration_sec} #{min_alert_measurements_percent * alert_lookback_duration}"
 
             projection = get_int_projection(int.id, alert.percentile, recordName, start_epoch, end_epoch, alert.watermark, Setting.first.max_trending_future_days)
             #puts projection.inspect
-            
+            puts "  "
             #skip this alert if we are not already in an exhaustion situation and we dont think there will be enough measurements
             if projection > 1 and measurement_duration_sec < (min_alert_measurements_percent * alert_lookback_duration)
-              puts "Skipping as there is not enough data: #{int.device.hostname}_#{int.name}, #{projection} days"
+              puts "    Skipping as there is not enough data: #{int.device.hostname}_#{int.name}, #{projection} days"
               #if there is an alert for this already, delete it
               int.alert_logs.where(:record => recordName, :alert_id => alert.id).destroy_all
               next
             elsif projection <= alert.days_out
               #generate alert
-              puts "Alert fired for Alert.name: #{alert.name}, Int.id: #{int.id}, Int.device.hostname: #{int.device.hostname}, Int.name: #{int.name}, Record: #{recordName}, Projection: #{projection}"
+              puts "    Alert fired for Alert.name: #{alert.name}, Int.id: #{int.id}, Int.device.hostname: #{int.device.hostname}, Int.name: #{int.name}, Record: #{recordName}, Projection: #{projection}"
               alert_log_entry = int.alert_logs.where(:record => recordName, :alert_id => alert.id).first
               if alert_log_entry
                 alert_log_entry.update(:record => recordName, :projection => projection.days.from_now, :alert_id => alert.id)
@@ -82,8 +83,8 @@ Alert.all.each do |alert|
           end
         end
       end
-    elsif alert.int_type == 'interface_group'
-      InterfaceGroups.each do |int_group|
+    elsif alert.int_type == 'interface-group'
+      InterfaceGroup.all.each do |int_group|
         #foreach record to collect
         recordsToCollect.each do |recordName,recordShortName|
           #check if there are at least xx% of the expected records
@@ -103,7 +104,7 @@ Alert.all.each do |alert|
             next
           elsif projection <= alert.days_out
             #generate alert
-            puts "Alert fired for Alert.name: #{alert.name}, Int_group.id: #{int_group.id}, Int_group.device.hostname: #{int_group.device.hostname}, Int_group.name: #{int_group.name}, Record: #{recordName}, Projection: #{projection}"
+            puts "Alert fired for Alert.name: #{alert.name}, Int_group.id: #{int_group.id}, Int_group.name: #{int_group.name}, Record: #{recordName}, Projection: #{projection}"
             alert_log_entry = int_group.alert_logs.where(:record => recordName, :alert_id => alert.id).first
             if alert_log_entry
               alert_log_entry.update(:record => recordName, :projection => projection.days.from_now, :alert_id => alert.id)
