@@ -91,8 +91,11 @@ InterfaceGroup.all.each do |int_group|
         (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordShortName, starting_point_epoch, sliceSize) 
         sMath.loadGroupValues(arrayOfX, arrayOfY, int.id)
       end
-      #aggregate all the figures -- TODO PERFORMANCE benchmark(0.16-0.25) 
-      sMath.aggregateGroupValues(window) 
+      #aggregate all the figures 
+      if sMath.aggregateGroupValues(window) == false
+        puts "Failed to load values for aggregate group"
+        next
+      end
 
       (arrayOfX_unfiltered, arrayOfY_unfiltered) = sMath.getRawVals
       arrayOfX = arrayOfX_unfiltered.shift(sliceSize)
@@ -123,6 +126,9 @@ InterfaceGroup.all.each do |int_group|
     if write_checkpoint > 0
       puts "Writting checkpoint for Int Group=#{int_group.name},checkpoint=#{checkpoint_epoch}"
       int_group.update(:import_checkpoint => Time.at(checkpoint_epoch))
+    else
+      puts "Import Complete for object"
+      break
     end
   end
 end

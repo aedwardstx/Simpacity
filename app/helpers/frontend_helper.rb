@@ -240,10 +240,13 @@ module FrontendHelper
       end
       
       records.each do |record|
-        average_rate = int.averages.where(:percentile => percentile, :record => record).first.gauge
-        #average_rate = get_int_average_rate(int.id, record)
-        #@charts[int.id][record]['values']['projection'] = projection  
-        @charts[int.id][record]['values']['average_rate'] = average_rate
+        first_element = int.averages.where(:percentile => percentile, :record => record).first
+        if first_element
+          average_rate = first_element.gauge
+          #average_rate = get_int_average_rate(int.id, record)
+          #@charts[int.id][record]['values']['projection'] = projection  
+          @charts[int.id][record]['values']['average_rate'] = average_rate
+        end
       end
     end
     return @charts

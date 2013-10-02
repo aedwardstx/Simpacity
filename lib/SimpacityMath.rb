@@ -53,6 +53,9 @@ class SimpacityMath
 
   #Combine @groupMeasurements into a single group of xvals and yvals
   def aggregateGroupValues(window)
+    if not defined? @groupMeasurements or @groupMeasurements.count == 0
+      return false
+    end
     sorted_measurements = @groupMeasurements.sort_by { |k| k["time"] }
     @groupMeasurements = nil
     measurements_window = []   # will hold a history of values with a time with in the window
