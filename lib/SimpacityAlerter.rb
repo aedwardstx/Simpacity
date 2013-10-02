@@ -51,8 +51,9 @@ Alert.all.each do |alert|
           #foreach record to collect
           recordsToCollect.each do |recordName,recordShortName|
 
-            #check if there are at least xx% of the expected records
+            #check if there are at least xx% of the expected records.  TODO - This is a bad way to do this, use a where to grab first and last instead
             (temp_times, temp_gauges) = get_int_measurements(int.id, alert.percentile, recordName, start_epoch, end_epoch)
+            next if temp_times.length == 0
             measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
             alert_lookback_duration = end_epoch - start_epoch
 
@@ -87,8 +88,9 @@ Alert.all.each do |alert|
       InterfaceGroup.all.each do |int_group|
         #foreach record to collect
         recordsToCollect.each do |recordName,recordShortName|
-          #check if there are at least xx% of the expected records
+          #check if there are at least xx% of the expected records. TODO - This is a bad way to do this, use a where to grab first and last instead
           (temp_times, temp_gauges) = get_int_group_measurements(int_group.id, alert.percentile, recordName, start_epoch, end_epoch)
+          next if temp_times.length == 0
           measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
           alert_lookback_duration = end_epoch - start_epoch
 
