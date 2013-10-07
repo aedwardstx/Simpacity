@@ -39,6 +39,7 @@ def getRawMeasurements(hostname, interface, recordName, starting_point_epoch, sl
   xvals = Array.new
   yvals = Array.new
 
+  puts "Getting raw measurements: collection: #{collection}, $gt: #{starting_point_epoch}, $lt: #{Time.now.to_i}, #{interface}, #{recordName}, #{@min_Bps_for_inclusion}, #{interface}, #{sliceSize}"
   @db[collection].find({'_id' => {:$gt => starting_point_epoch, :$lt => Time.now.to_i}, "rate.#{interface}.#{recordName}" => {:$gt => @min_Bps_for_inclusion}}, :fields => "rate.#{interface}", :sort => ['_id', Mongo::ASCENDING], :limit => sliceSize).each do |measurement|
     if defined? measurement['rate'][interface][recordName] and measurement['rate'][interface][recordName].is_a? Integer
       gauge = measurement['rate'][interface][recordName] * 8  
@@ -104,6 +105,9 @@ Interface.all.each do |int|
     if write_checkpoint > 0
       puts "Writting checkpoint for hostname=#{int.device.hostname},interface=#{int.name},checkpoint=#{checkpoint_epoch}"
       int.update(:import_checkpoint => Time.at(checkpoint_epoch))
+    else
+      puts "Import Complete for object"
+      break
     end
   end
 end

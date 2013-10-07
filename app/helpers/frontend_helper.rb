@@ -243,9 +243,9 @@ module FrontendHelper
         first_element = int.averages.where(:percentile => percentile, :record => record).first
         if first_element
           average_rate = first_element.gauge
-          #average_rate = get_int_average_rate(int.id, record)
-          #@charts[int.id][record]['values']['projection'] = projection  
           @charts[int.id][record]['values']['average_rate'] = average_rate
+        else
+          @charts[int.id][record]['values']['average_rate'] = 0
         end
       end
     end
@@ -266,9 +266,9 @@ module FrontendHelper
         first_element = int_group.averages.where(:percentile => percentile, :record => record).first
         if first_element
           average_rate = first_element.gauge
-          #average_rate = get_int_group_average_rate(int_group.id, record)
-          #@charts[int_group.id][record]['values']['projection'] = projection  
           @charts[int_group.id][record]['values']['average_rate'] = average_rate
+        else
+          @charts[int_group.id][record]['values']['average_rate'] = 0
         end
       end
       #get alert info
