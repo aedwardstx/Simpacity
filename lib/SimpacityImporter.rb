@@ -11,6 +11,9 @@ simpacity_base = '/opt/simpacity-dev'
 
 require "#{simpacity_base}/lib/SimpacityExtensionCommon.rb"
 
+#for testing
+#require 'object_graph'
+
 @min_Bps_for_inclusion = Setting.first.min_bps_for_inclusion / 8 
 @polling_interval_secs = Setting.first.polling_interval_secs
 
@@ -52,7 +55,7 @@ def getRawMeasurements(hostname, interface, recordName, starting_point_epoch, sl
   end
   return xvals, yvals
 end
-
+  
 Interface.all.each do |int|
   puts "DEBUG -- interface=#{int.name},device=#{int.device.hostname}"
 
@@ -110,5 +113,6 @@ Interface.all.each do |int|
       break
     end
   end
+  GC.start()
 end
 

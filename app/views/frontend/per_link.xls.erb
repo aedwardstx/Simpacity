@@ -11,9 +11,7 @@
         <Cell><Data ss:Type="String">Interface</Data></Cell>
         <Cell><Data ss:Type="String">Link Type</Data></Cell>
         <Cell><Data ss:Type="String">Bandwidth</Data></Cell>
-        <Cell><Data ss:Type="String">Rx Projected</Data></Cell>
         <Cell><Data ss:Type="String">Rx Average bps</Data></Cell>
-        <Cell><Data ss:Type="String">Tx Projected</Data></Cell>
         <Cell><Data ss:Type="String">Tx Average bps</Data></Cell>
       </Row>
     <% @charts.each_key do |int_id| %>
@@ -22,9 +20,7 @@
         <Cell><Data ss:Type="String"><%= @charts[int_id]['interfaceName'] %></Data></Cell>
         <Cell><Data ss:Type="String"><%= @charts[int_id]['interfaceLinkType'] %></Data></Cell>
         <Cell><Data ss:Type="Number"><%= @charts[int_id]['bandwidth'] %></Data></Cell>
-        <Cell><Data ss:Type="Number"><%= @charts[int_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></Data></Cell>
         <Cell><Data ss:Type="Number"><%= @charts[int_id]['ifInOctets']['values']['average_rate'] %></Data></Cell>
-        <Cell><Data ss:Type="Number"><%= @charts[int_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></Data></Cell>
         <Cell><Data ss:Type="Number"><%= @charts[int_id]['ifOutOctets']['values']['average_rate'] %></Data></Cell>
       </Row>
     <% end %>

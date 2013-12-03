@@ -9,18 +9,14 @@
       <Row>
         <Cell><Data ss:Type="String">Interface Group Name</Data></Cell>
         <Cell><Data ss:Type="String">Bandwidth</Data></Cell>
-        <Cell><Data ss:Type="String">Rx Projected</Data></Cell>
         <Cell><Data ss:Type="String">Rx Average bps</Data></Cell>
-        <Cell><Data ss:Type="String">Tx Projected</Data></Cell>
         <Cell><Data ss:Type="String">Tx Average bps</Data></Cell>
       </Row>
     <% @charts.each_key do |int_group_id| %>
       <Row>
         <Cell><Data ss:Type="String"><%= @charts[int_group_id]['int_group_name'] %></Data></Cell>
         <Cell><Data ss:Type="Number"><%= @charts[int_group_id]['bandwidth'] %></Data></Cell>
-        <Cell><Data ss:Type="Number"><%= @charts[int_group_id]['ifInOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></Data></Cell>
         <Cell><Data ss:Type="Number"><%= @charts[int_group_id]['ifInOctets']['values']['average_rate'] %></Data></Cell>
-        <Cell><Data ss:Type="Number"><%= @charts[int_group_id]['ifOutOctets']['values']['projection'].days.from_now.to_date.strftime("%d/%m/%Y") %></Data></Cell>
         <Cell><Data ss:Type="Number"><%= @charts[int_group_id]['ifOutOctets']['values']['average_rate'] %></Data></Cell>
       </Row>
     <% end %>
@@ -37,7 +33,7 @@
       <% @charts.each_key do |int_group_id| %>
         <% records = ['ifInOctets','ifOutOctets'] %>
         <% records.each do |record| %>
-          <% (time, gauge) = get_int_measurements(int_group_id, @post_var['percentile'], record, @post_var['start_epoch'], @post_var['end_epoch']) %>
+          <% (time, gauge) = get_int_group_measurements(int_group_id, @post_var['percentile'], record, @post_var['start_epoch'], @post_var['end_epoch']) %>
           <% time.each_index do |index| %>
             <Row>
               <Cell><Data ss:Type="String"><%= @charts[int_group_id]['int_group_name'] %></Data></Cell>
