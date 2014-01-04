@@ -32,16 +32,16 @@ class Device < ActiveRecord::Base
   protected
 
   #Update Zpoller when devices are updated/added/removed
-  def update_zpoller
-    File.open(Setting.first.zpoller_hosts_location, 'w') do |f2|
-      Device.find(:all).each do |device|
-        f2.puts "\"#{device.hostname}\",\"#{device.hostname}\",\"#{device.snmp.community_string}\""
-      end
-    end
-    #run the zpoller config update script
-    current_dir = Dir.pwd
-    Dir.chdir Setting.first.zpoller_base_dir
-    system(Setting.first.zconfig_location)
-    Dir.chdir current_dir
-  end
+  #def update_zpoller
+  #  File.open(Setting.first.zpoller_hosts_location, 'w') do |f2|
+  #    Device.find(:all).each do |device|
+  #      f2.puts "\"#{device.hostname}\",\"#{device.hostname}\",\"#{device.snmp.community_string}\""
+  #    end
+  #  end
+  #  #run the zpoller config update script
+  #  current_dir = Dir.pwd
+  #  Dir.chdir Setting.first.zpoller_base_dir
+  #  system(Setting.first.zconfig_location)
+  #  Dir.chdir current_dir
+  #end
 end

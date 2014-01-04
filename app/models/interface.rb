@@ -11,7 +11,7 @@ class Interface < ActiveRecord::Base
   #has_many :alerts, :through :alert_logs
   has_many :interface_groups, :through => :interface_group_relationships
   has_many :interface_group_relationships, :dependent => :destroy
-  has_many :measurements, :dependent => :destroy
+  has_many :measurements, :dependent => :delete_all
 
   validates_presence_of :device
   validates_presence_of :link_type_id
