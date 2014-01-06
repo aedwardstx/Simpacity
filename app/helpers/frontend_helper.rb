@@ -75,7 +75,7 @@ module FrontendHelper
     int = Interface.find(int_id)
     start_time = Time.at(start_epoch)
     end_time = Time.at(end_epoch)
-    measureTemp = int.measurements.where(:collected_at => start_time..end_time, :percentile => percentile, :record => record).pluck(:collected_at, :gauge)
+    measureTemp = int.measurements.where(:collected_at => start_time..end_time, :percentile => percentile, :record => record).order(collected_at: :asc).pluck(:collected_at, :gauge)
     times = []
     gauges = []
     measureTemp.each do |element|
@@ -89,7 +89,7 @@ module FrontendHelper
     int_group = InterfaceGroup.find(int_group_id)
     start_time = Time.at(start_epoch)
     end_time = Time.at(end_epoch)
-    measureTemp = int_group.srlg_measurement.where(:collected_at => start_time..end_time, :percentile => percentile, :record => record).pluck(:collected_at, :gauge)
+    measureTemp = int_group.srlg_measurement.where(:collected_at => start_time..end_time, :percentile => percentile, :record => record).order(collected_at: :asc).pluck(:collected_at, :gauge)
     times = []
     gauges = []
     measureTemp.each do |element|
