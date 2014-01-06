@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130930181802) do
+ActiveRecord::Schema.define(version: 20140106034959) do
 
   create_table "alert_logs", force: true do |t|
     t.integer  "alert_id"
@@ -152,6 +152,7 @@ ActiveRecord::Schema.define(version: 20130930181802) do
     t.integer  "min_alert_measurements_percent"
     t.integer  "min_bps_for_inclusion",               limit: 8
     t.string   "source_email_address"
+    t.integer  "average_previous_hours"
   end
 
   create_table "snmps", force: true do |t|

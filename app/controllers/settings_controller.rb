@@ -64,6 +64,6 @@ class SettingsController < ApplicationController
                                       :mongodb_test_window, :mongodb_db_hostname, :mongodb_db_port, :mongodb_db_name, 
                                       :link_group_importer_lookback_window, :zpoller_poller_interval, :mailhost, 
                                       :polling_interval_secs, :max_trending_future_days, :min_alert_measurements_percent,
-                                      :min_bps_for_inclusion, :source_email_address)
+                                      :min_bps_for_inclusion, :source_email_address, :average_previous_hours)
     end
 end

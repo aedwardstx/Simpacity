@@ -28,4 +28,5 @@ Setting.create  :slice_size => 100,
                 :mongodb_db_name => 'zpoller',
                 :min_alert_measurements_percent => 90,
                 :min_bps_for_inclusion => 100000,
-                :source_email_address => 'simpacity-qa@rackspace.com'
+                :source_email_address => 'simpacity-qa@rackspace.com',
+                :average_previous_hours=> 150

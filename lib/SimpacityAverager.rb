@@ -24,7 +24,7 @@ include AlertsHelper
 records = ['ifInOctets','ifOutOctets']
 
 #TODO -- move average calc percentile and days back to general settings
-average_previous_hours = 36
+average_previous_hours = Setting.first.average_previous_hours
 
 records.each do |record|
   [100,50,25,10,5,1].each do |percentile|
@@ -45,6 +45,7 @@ records.each do |record|
       #store to AR
       int.averages.where(:percentile => percentile, :record => record).destroy_all
       int.averages.create(:percentile => percentile, :record => record, :gauge => average)
+      puts "done with ittr"
     end
 
     InterfaceGroup.all.each do |int_group|
@@ -64,6 +65,7 @@ records.each do |record|
       #store to AR
       int_group.averages.where(:percentile => percentile, :record => record).destroy_all
       int_group.averages.create(:percentile => percentile, :record => record, :gauge => average)
+      puts "done with itter"
     end
   end
 end
