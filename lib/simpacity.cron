@@ -3,7 +3,8 @@ PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games:/usr/local/sbin:/usr/s
 #10 0 * * * root ruby /opt/simpacity-dev/lib/SimpacityAutodiscover.rb >> /opt/simpacity-dev/log/SimpacityAutodiscovery.log
 */15 * * * * root ruby /opt/simpacity-dev/lib/SimpacityZpollerUpdate.rb >> /opt/simpacity-dev/log/SimpacityZpollerUpdate.log
 30 6 * * * root ruby /opt/simpacity-dev/lib/SimpacityOddjob.rb >> /opt/simpacity-dev/log/SimpacityOddjob.log
-50 6 * * * root ruby /opt/simpacity-dev/lib/SimpacityImporter.rb >> /opt/simpacity-dev/log/SimpacityImporter.log
-10 9 * * * root ruby /opt/simpacity-dev/lib/SimpacitySRLGImporter.rb >> /opt/simpacity-dev/log/SimpacitySRLGImporter.log
-10 12 * * * root ruby /opt/simpacity-dev/lib/SimpacityAlerter.rb >> /opt/simpacity-dev/log/SimpacityAlerter.log
-0 * * * * root ruby /opt/simpacity-dev/lib/SimpacityAverager.rb >> /opt/simpacity-dev/log/SimpacityAverager.log
+45 */6 * * * root ruby /opt/simpacity-dev/lib/SimpacityImporter.rb >> /opt/simpacity-dev/log/SimpacityImporter.log
+15 */6 * * * root ruby /opt/simpacity-dev/lib/SimpacitySRLGImporter.rb >> /opt/simpacity-dev/log/SimpacitySRLGImporter.log
+10 10 * * * root ruby /opt/simpacity-dev/lib/SimpacityAlerter.rb >> /opt/simpacity-dev/log/SimpacityAlerter.log
+0 */12 * * * root ruby /opt/simpacity-dev/lib/SimpacityAverager.rb >> /opt/simpacity-dev/log/SimpacityAverager.log
+0 0 * * 0 root /etc/init.d/zpoller restart 

@@ -60,10 +60,11 @@ end
 InterfaceGroup.all.each do |int_group|
   #if the refresh_next_import bool is true, delete all points in AR for the interface_group
   if int_group.refresh_next_import == true 
-    puts "Deleting all entries in AR for #{int_group.name} as refresh_next_import was set to true"
-    int_group.srlg_measurement.destroy_all  #delete_all may be faster and all thats needed
-    int_group.update(:import_checkpoint => nil, :refresh_next_import => false)
+    puts "Deleting all entries in AR for #{int_group.id},#{int_group.name} as refresh_next_import was set to true"
+    SrlgMeasurement.delete_all(:interface_group_id => int_group.id)
+    #int_group.srlg_measurement.destroy_all  
     puts "Done deleting entries, resetting import_checkpoint to nil, and refresh_next_import to false"
+    int_group.update(:import_checkpoint => nil, :refresh_next_import => false)
   end
 
   #bandwidth = get_int_group_bandwidth(int_group.id)
