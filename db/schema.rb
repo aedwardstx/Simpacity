@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140106034959) do
+ActiveRecord::Schema.define(version: 20140530053457) do
 
   create_table "alert_logs", force: true do |t|
     t.integer  "alert_id"
@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 20140106034959) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "projection"
-    t.string   "record"
+    t.string   "noid"
   end
 
   create_table "alerts", force: true do |t|
@@ -44,7 +44,7 @@ ActiveRecord::Schema.define(version: 20140106034959) do
   create_table "averages", force: true do |t|
     t.integer  "averageable_id"
     t.string   "averageable_type"
-    t.string   "record"
+    t.string   "noid"
     t.integer  "percentile"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -124,7 +124,7 @@ ActiveRecord::Schema.define(version: 20140106034959) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "percentile"
-    t.string   "record"
+    t.string   "noid"
     t.integer  "gauge",        limit: 8
   end
 
@@ -167,7 +167,7 @@ ActiveRecord::Schema.define(version: 20140106034959) do
     t.integer  "interface_group_id"
     t.datetime "collected_at"
     t.integer  "percentile"
-    t.string   "record"
+    t.string   "noid"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "gauge",              limit: 8

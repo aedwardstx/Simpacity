@@ -29,24 +29,24 @@ sliceSize = Setting.first.slice_size
 #Move this definition to AR on a per-interface basis in the future
 # This will do a best effort to grab these values from Mongo
 #   will need logic to softfail if values are not there
-#recordsToCollect = ['ifInOctets','ifOutOctets']
+#noidsToCollect = ['ifInOctets','ifOutOctets']
 #Provides a mapping for common name to the shorthand name used in the DB
-recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
+noidsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
 
 @client = MongoClient.new(Setting.first.mongodb_db_hostname, Setting.first.mongodb_db_port)
 @db     = @client[Setting.first.mongodb_db_name]
 
 
-def getRawMeasurements(hostname, interface, recordName, starting_point_epoch, sliceSize)
-  #Passed a hostname, interface, recordName, startTime, endTime
-  #puts "getRawMeasurements DEBUG -- hostname=#{hostname},interface=#{interface},recordName=#{recordName},startTime=#{startTime},endTime=#{endTime}"
+def getRawMeasurements(hostname, interface, noidName, starting_point_epoch, sliceSize)
+  #Passed a hostname, interface, noidName, startTime, endTime
+  #puts "getRawMeasurements DEBUG -- hostname=#{hostname},interface=#{interface},noidName=#{noidName},startTime=#{startTime},endTime=#{endTime}"
   collection = "host.#{hostname}"
   xvals = Array.new
   yvals = Array.new
 
-  @db[collection].find({'_id' => {:$gt => starting_point_epoch, :$lt => Time.now.to_i}, "rate.#{interface}.#{recordName}" => {:$gt => @min_Bps_for_inclusion}}, :fields => "rate.#{interface}", :sort => ['_id', Mongo::ASCENDING], :limit => sliceSize).each do |measurement|
-    if defined? measurement['rate'][interface][recordName] and measurement['rate'][interface][recordName].is_a? Integer
-      gauge = measurement['rate'][interface][recordName] * 8  
+  @db[collection].find({'_id' => {:$gt => starting_point_epoch, :$lt => Time.now.to_i}, "rate.#{interface}.#{noidName}" => {:$gt => @min_Bps_for_inclusion}}, :fields => "rate.#{interface}", :sort => ['_id', Mongo::ASCENDING], :limit => sliceSize).each do |measurement|
+    if defined? measurement['rate'][interface][noidName] and measurement['rate'][interface][noidName].is_a? Integer
+      gauge = measurement['rate'][interface][noidName] * 8  
       #puts "line #{measurement['_id']} #{gauge}"
       xvals << measurement['_id']
       yvals << gauge
@@ -83,14 +83,14 @@ InterfaceGroup.all.each do |int_group|
 
     write_checkpoint = 0
     checkpoint_epoch = 0
-    #foreach record to collect
-    recordsToCollect.each do |recordName,recordShortName|
+    #foreach noid to collect
+    noidsToCollect.each do |noidName,noidShortName|
       sMath = SimpacityMath.new(sliceSize)
 
       #load the raw data into SimpacityMath
       int_group.interfaces.each do |int|
-        puts "Loading data from MongoDB - #{int.device.hostname},#{int.name},#{recordName},#{starting_point_epoch},#{sliceSize}"
-        (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, recordShortName, starting_point_epoch, sliceSize) 
+        puts "Loading data from MongoDB - #{int.device.hostname},#{int.name},#{noidName},#{starting_point_epoch},#{sliceSize}"
+        (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, noidShortName, starting_point_epoch, sliceSize) 
         sMath.loadGroupValues(arrayOfX, arrayOfY, int.id)
       end
       #aggregate all the figures 
@@ -113,10 +113,10 @@ InterfaceGroup.all.each do |int_group|
 
         percentiles.each do |percentile|
           sampleY = arrayOfY.sort[-percentile..-1].inject{ |sum, element| sum + element }.to_f / percentile 
-          puts "Debug -- insert into AR - Int_Group=#{int_group.name},record=#{recordName},percentile=#{percentile},collected_at=#{sampleX},gauge=#{sampleY}"
+          puts "Debug -- insert into AR - Int_Group=#{int_group.name},noid=#{noidName},percentile=#{percentile},collected_at=#{sampleX},gauge=#{sampleY}"
 
-          #update records in AR
-          int_group.srlg_measurement.create(:record => recordName, :percentile => percentile, :collected_at => Time.at(sampleX), :gauge => sampleY)
+          #update noids in AR
+          int_group.srlg_measurement.create(:noid => noidName, :percentile => percentile, :collected_at => Time.at(sampleX), :gauge => sampleY)
           
         end
         proposed_checkpoint_epoch = arrayOfX.sort[-1]

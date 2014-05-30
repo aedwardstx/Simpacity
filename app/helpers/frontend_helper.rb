@@ -9,27 +9,27 @@ module FrontendHelper
     bandwidth = Interface.find(int_id).bandwidth
     watermark = params[:watermark].to_f
     @chart = {}
-    ['ifInOctets', 'ifOutOctets'].each do |record|
-      @chart[record] = {}
-      @chart[record]['points'] = []
-      @chart[record]['stats'] = {}
-      (arrayOfX, arrayOfY) = get_int_measurements(int_id, percentile, record, start_epoch, end_epoch)
+    ['ifInOctets', 'ifOutOctets'].each do |noid|
+      @chart[noid] = {}
+      @chart[noid]['points'] = []
+      @chart[noid]['stats'] = {}
+      (arrayOfX, arrayOfY) = get_int_measurements(int_id, percentile, noid, start_epoch, end_epoch)
       arrayOfX.each_with_index do |element,index|
-        @chart[record]['points'][index] = []
-        @chart[record]['points'][index] << element.to_i * 1000
-        @chart[record]['points'][index] << arrayOfY[index]
+        @chart[noid]['points'][index] = []
+        @chart[noid]['points'][index] << element.to_i * 1000
+        @chart[noid]['points'][index] << arrayOfY[index]
       end
 
-      first_record_point_x = @chart[record]['points'][0][0] 
-      last_record_point_x = @chart[record]['points'][-1][0]
-      first_projection_point_x = first_record_point_x / 1000
+      first_noid_point_x = @chart[noid]['points'][0][0] 
+      last_noid_point_x = @chart[noid]['points'][-1][0]
+      first_projection_point_x = first_noid_point_x / 1000
       #TODO -- abstarct the number of future days to graph a projection into general settings
-      last_projection_point_x = (last_record_point_x / 1000) + (84600 * 30)
+      last_projection_point_x = (last_noid_point_x / 1000) + (84600 * 30)
 
       (projection,average_rate,projection_start,projection_end) = get_int_stats2(int_id, percentile, arrayOfX, arrayOfY, first_projection_point_x, last_projection_point_x, watermark)
-      @chart[record]['stats']['average_rate'] = [[first_record_point_x,average_rate],[last_record_point_x,average_rate]]
-      @chart[record]['stats']['projection'] = [[first_projection_point_x * 1000,projection_start],[last_projection_point_x * 1000,projection_end]] 
-      @chart['watermark'] = [[first_record_point_x,watermark * bandwidth],[last_projection_point_x * 1000,watermark * bandwidth]] 
+      @chart[noid]['stats']['average_rate'] = [[first_noid_point_x,average_rate],[last_noid_point_x,average_rate]]
+      @chart[noid]['stats']['projection'] = [[first_projection_point_x * 1000,projection_start],[last_projection_point_x * 1000,projection_end]] 
+      @chart['watermark'] = [[first_noid_point_x,watermark * bandwidth],[last_projection_point_x * 1000,watermark * bandwidth]] 
     end
     respond_to do |format|
       format.json { render :json => @chart.to_json }
@@ -44,38 +44,38 @@ module FrontendHelper
     bandwidth = get_int_group_bandwidth(int_group_id) 
     watermark = params[:watermark].to_f
     @chart = {}
-    ['ifInOctets', 'ifOutOctets'].each do |record|
-      @chart[record] = {}
-      @chart[record]['points'] = []
-      @chart[record]['stats'] = {}
-      (arrayOfX, arrayOfY) = get_int_group_measurements(int_group_id, percentile, record, start_epoch, end_epoch)
+    ['ifInOctets', 'ifOutOctets'].each do |noid|
+      @chart[noid] = {}
+      @chart[noid]['points'] = []
+      @chart[noid]['stats'] = {}
+      (arrayOfX, arrayOfY) = get_int_group_measurements(int_group_id, percentile, noid, start_epoch, end_epoch)
       arrayOfX.each_with_index do |element,index|
-        @chart[record]['points'][index] = []
-        @chart[record]['points'][index] << element.to_i * 1000
-        @chart[record]['points'][index] << arrayOfY[index]
+        @chart[noid]['points'][index] = []
+        @chart[noid]['points'][index] << element.to_i * 1000
+        @chart[noid]['points'][index] << arrayOfY[index]
       end
 
-      first_record_point_x = @chart[record]['points'][0][0] 
-      last_record_point_x = @chart[record]['points'][-1][0]
-      first_projection_point_x = first_record_point_x / 1000
+      first_noid_point_x = @chart[noid]['points'][0][0] 
+      last_noid_point_x = @chart[noid]['points'][-1][0]
+      first_projection_point_x = first_noid_point_x / 1000
       #TODO -- abstarct the number of future days to graph a projection into general settings
-      last_projection_point_x = (last_record_point_x / 1000) + (84600 * 30)
+      last_projection_point_x = (last_noid_point_x / 1000) + (84600 * 30)
 
       (projection,average_rate,projection_start,projection_end) = get_int_group_stats2(int_group_id, percentile, arrayOfX, arrayOfY, first_projection_point_x, last_projection_point_x, watermark)
-      @chart[record]['stats']['average_rate'] = [[first_record_point_x,average_rate],[last_record_point_x,average_rate]]
-      @chart[record]['stats']['projection'] = [[first_projection_point_x * 1000,projection_start],[last_projection_point_x * 1000,projection_end]] 
-      @chart['watermark'] = [[first_record_point_x,watermark * bandwidth],[last_projection_point_x * 1000,watermark * bandwidth]] 
+      @chart[noid]['stats']['average_rate'] = [[first_noid_point_x,average_rate],[last_noid_point_x,average_rate]]
+      @chart[noid]['stats']['projection'] = [[first_projection_point_x * 1000,projection_start],[last_projection_point_x * 1000,projection_end]] 
+      @chart['watermark'] = [[first_noid_point_x,watermark * bandwidth],[last_projection_point_x * 1000,watermark * bandwidth]] 
     end
     respond_to do |format|
       format.json { render :json => @chart.to_json }
     end
   end
 
-  def get_int_measurements(int_id, percentile, record, start_epoch, end_epoch)
+  def get_int_measurements(int_id, percentile, noid, start_epoch, end_epoch)
     int = Interface.find(int_id)
     start_time = Time.at(start_epoch)
     end_time = Time.at(end_epoch)
-    measureTemp = int.measurements.where(:collected_at => start_time..end_time, :percentile => percentile, :record => record).order(collected_at: :asc).pluck(:collected_at, :gauge)
+    measureTemp = int.measurements.where(:collected_at => start_time..end_time, :percentile => percentile, :noid => noid).order(collected_at: :asc).pluck(:collected_at, :gauge)
     times = []
     gauges = []
     measureTemp.each do |element|
@@ -85,11 +85,11 @@ module FrontendHelper
     return times, gauges
   end
 
-  def get_int_group_measurements(int_group_id, percentile, record, start_epoch, end_epoch)
+  def get_int_group_measurements(int_group_id, percentile, noid, start_epoch, end_epoch)
     int_group = InterfaceGroup.find(int_group_id)
     start_time = Time.at(start_epoch)
     end_time = Time.at(end_epoch)
-    measureTemp = int_group.srlg_measurement.where(:collected_at => start_time..end_time, :percentile => percentile, :record => record).order(collected_at: :asc).pluck(:collected_at, :gauge)
+    measureTemp = int_group.srlg_measurement.where(:collected_at => start_time..end_time, :percentile => percentile, :noid => noid).order(collected_at: :asc).pluck(:collected_at, :gauge)
     times = []
     gauges = []
     measureTemp.each do |element|
@@ -99,13 +99,13 @@ module FrontendHelper
     return times, gauges
   end
 
-  def get_int_group_average_rate(int_group_id, record)
+  def get_int_group_average_rate(int_group_id, noid)
     interface_group = InterfaceGroup.find(int_group_id)
 
     measure_count = 0
     measure_sum = 0
     #TODO -- move average calc percentile and days back to general settings
-    measurements = interface_group.srlg_measurement.where(:record => record, :percentile => 5, :collected_at => 7.days.ago..Time.now)
+    measurements = interface_group.srlg_measurement.where(:noid => noid, :percentile => 5, :collected_at => 7.days.ago..Time.now)
     measurements.each do |measures|
       measure_sum += measures.gauge
       measure_count += 1
@@ -118,13 +118,13 @@ module FrontendHelper
     end
   end
 
-  def get_int_average_rate(int_id, record)
+  def get_int_average_rate(int_id, noid)
     interface = Interface.find(int_id)
 
     measure_count = 0
     measure_sum = 0
     #TODO -- move average calc percentile and days back to general settings
-    measurements = interface.measurements.where(:record => record, :percentile => 5, :collected_at => 7.days.ago..Time.now)
+    measurements = interface.measurements.where(:noid => noid, :percentile => 5, :collected_at => 7.days.ago..Time.now)
     measurements.each do |measures|
       measure_sum += measures.gauge
       measure_count += 1
@@ -155,8 +155,8 @@ module FrontendHelper
     return projection, average_rate, projection_start, projection_end
   end
 
-  def get_int_stats(int_id, percentile, record, start_epoch, end_epoch, watermark)
-    (arrayOfX, arrayOfY) =  get_int_measurements(int_id, percentile, record, start_epoch, end_epoch)
+  def get_int_stats(int_id, percentile, noid, start_epoch, end_epoch, watermark)
+    (arrayOfX, arrayOfY) =  get_int_measurements(int_id, percentile, noid, start_epoch, end_epoch)
     calc = SimpacityMath.new(1)
     if calc.loadValues(arrayOfX, arrayOfY)
       interface = Interface.find(int_id)
@@ -174,8 +174,8 @@ module FrontendHelper
     return projection, average_rate, projection_start, projection_end
   end
 
-  def get_int_group_stats(int_group_id, percentile, record, start_epoch, end_epoch, watermark)
-    (arrayOfX, arrayOfY) =  get_int_group_measurements(int_group_id, percentile, record, start_epoch, end_epoch)
+  def get_int_group_stats(int_group_id, percentile, noid, start_epoch, end_epoch, watermark)
+    (arrayOfX, arrayOfY) =  get_int_group_measurements(int_group_id, percentile, noid, start_epoch, end_epoch)
     calc = SimpacityMath.new(1)
     if calc.loadValues(arrayOfX, arrayOfY)
       bandwidth = get_int_group_bandwidth(int_group_id)
@@ -223,7 +223,7 @@ module FrontendHelper
     @charts = hash_with_default_hash
 
     Interface.all.each do |int|
-      records = ['ifInOctets','ifOutOctets']
+      noids = ['ifInOctets','ifOutOctets']
       @charts[int.id]['deviceHostname'] = int.device.hostname
       @charts[int.id]['interfaceName'] = int.name
       @charts[int.id]['bandwidth'] = int.bandwidth
@@ -234,18 +234,18 @@ module FrontendHelper
       @charts[int.id]['alerts']['hoverList'] = []
       if int.alert_logs.count > 0
         int.alert_logs.each do |alert_log|
-          @charts[int.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Projection: #{alert_log.record}_#{alert_log.projection.to_date}"
+          @charts[int.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Projection: #{alert_log.noid}_#{alert_log.projection.to_date}"
           @charts[int.id]['alerts']['severity'] = alert_log.alert.severity if alert_log.alert.severity > @charts[int.id]['alerts']['severity']
         end
       end
       
-      records.each do |record|
-        first_element = int.averages.where(:percentile => percentile, :record => record).first
+      noids.each do |noid|
+        first_element = int.averages.where(:percentile => percentile, :noid => noid).first
         if first_element
           average_rate = first_element.gauge
-          @charts[int.id][record]['values']['average_rate'] = average_rate
+          @charts[int.id][noid]['values']['average_rate'] = average_rate
         else
-          @charts[int.id][record]['values']['average_rate'] = 0
+          @charts[int.id][noid]['values']['average_rate'] = 0
         end
       end
     end
@@ -259,16 +259,16 @@ module FrontendHelper
     @charts = hash_with_default_hash
 
     InterfaceGroup.all.each do |int_group|
-      records = ['ifInOctets','ifOutOctets']
+      noids = ['ifInOctets','ifOutOctets']
       @charts[int_group.id]['int_group_name'] = int_group.name
       @charts[int_group.id]['bandwidth'] = get_int_group_bandwidth(int_group.id)
-      records.each do |record|
-        first_element = int_group.averages.where(:percentile => percentile, :record => record).first
+      noids.each do |noid|
+        first_element = int_group.averages.where(:percentile => percentile, :noid => noid).first
         if first_element
           average_rate = first_element.gauge
-          @charts[int_group.id][record]['values']['average_rate'] = average_rate
+          @charts[int_group.id][noid]['values']['average_rate'] = average_rate
         else
-          @charts[int_group.id][record]['values']['average_rate'] = 0
+          @charts[int_group.id][noid]['values']['average_rate'] = 0
         end
       end
       #get alert info
@@ -276,7 +276,7 @@ module FrontendHelper
       @charts[int_group.id]['alerts']['hoverList'] = []
       if int_group.alert_logs.count > 0
         int_group.alert_logs.each do |alert_log|
-          @charts[int_group.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Projection: #{alert_log.record}_#{alert_log.projection.to_date}"
+          @charts[int_group.id]['alerts']['hoverList'] << "#{alert_log.alert.name} - Projection: #{alert_log.noid}_#{alert_log.projection.to_date}"
           @charts[int_group.id]['alerts']['severity'] = alert_log.alert.severity if alert_log.alert.severity > @charts[int_group.id]['alerts']['severity']
         end
       end

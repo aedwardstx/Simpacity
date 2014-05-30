@@ -9,19 +9,19 @@ simpacity_base = '/opt/simpacity-dev'
 
 require "#{simpacity_base}/lib/SimpacityExtensionCommon.rb"
 
-recordsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
+noidsToCollect = { 'ifInOctets' => 'i', 'ifOutOctets' => 'o'}
 
-def getRawMeasurements(hostname, interface, recordName, startTime, endTime)
-  #Passed a hostname, interface, recordName, startTime, endTime
-  #puts "getRawMeasurements DEBUG -- hostname=#{hostname},interface=#{interface},recordName=#{recordName},startTime=#{startTime},endTime=#{endTime}"
+def getRawMeasurements(hostname, interface, noidName, startTime, endTime)
+  #Passed a hostname, interface, noidName, startTime, endTime
+  #puts "getRawMeasurements DEBUG -- hostname=#{hostname},interface=#{interface},noidName=#{noidName},startTime=#{startTime},endTime=#{endTime}"
   collection = "host.#{hostname}"
   xvals = Array.new
   yvals = Array.new
 
   @db[collection].find({'_id' => {:$gt => startTime.to_i, :$lt => endTime.to_i}}).each do |measurement|
-      #puts "line #{measurement['_id']} #{measurement['rate'][interface][recordName]}"
+      #puts "line #{measurement['_id']} #{measurement['rate'][interface][noidName]}"
       xvals << measurement['_id']
-      yvals << measurement['rate'][interface][recordName] * 8
+      yvals << measurement['rate'][interface][noidName] * 8
   end
   return xvals, yvals
 end

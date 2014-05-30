@@ -36,14 +36,14 @@
         <Cell><Data ss:Type="String">Gauge</Data></Cell>
       </Row>
       <% @charts.each_key do |int_id| %>
-        <% records = ['ifInOctets','ifOutOctets'] %>
-        <% records.each do |record| %>
-          <% (time, gauge) = get_int_measurements(int_id, @post_var['percentile'], record, @post_var['start_epoch'], @post_var['end_epoch']) %>
+        <% noids = ['ifInOctets','ifOutOctets'] %>
+        <% noids.each do |noid| %>
+          <% (time, gauge) = get_int_measurements(int_id, @post_var['percentile'], noid, @post_var['start_epoch'], @post_var['end_epoch']) %>
           <% time.each_index do |index| %>
             <Row>
               <Cell><Data ss:Type="String"><%= @charts[int_id]['deviceHostname'] %></Data></Cell>
               <Cell><Data ss:Type="String"><%= @charts[int_id]['interfaceName'] %></Data></Cell>
-              <Cell><Data ss:Type="String"><%= record %></Data></Cell>
+              <Cell><Data ss:Type="String"><%= noid %></Data></Cell>
               <Cell><Data ss:Type="String"><%= Time.at(time[index]).to_s %></Data></Cell>
               <Cell><Data ss:Type="Number"><%= gauge[index] %></Data></Cell>
             </Row>
