@@ -53,7 +53,12 @@
         <td><%= number_to_human_size(@charts[int_id]['ifInOctets']['values']['average_rate'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
         <td><%= number_to_human_size(@charts[int_id]['ifOutOctets']['values']['average_rate'], :precision => 4, :prefix => :si, :locale => :simpacity_custom) %></td>
         <td><a id="severityPopover" href="#" data-content="<%= @charts[int_id]['alerts']['hoverList'] %>" rel="popover" data-placement="right" data-original-title="Triggered Alerts" data-trigger="hover"><%= @charts[int_id]['alerts']['severity'] %></a></td>
-        <td><%= button_to_function "Chart it!", "chartit('#{@charts[int_id]['deviceHostname']}','#{@charts[int_id]['interfaceName']}',#{int_id},#{@post_var['watermark']},#{@post_var['percentile']},#{@post_var['start_epoch']},#{@post_var['end_epoch']});", class: "ok btn btn-mini" %></td>
+        <td>
+          <input class="ok btn btn-mini" onclick="chartit('<%=@charts[int_id]['deviceHostname']%>', 
+          '<%=@charts[int_id]['interfaceName']%>', <%=int_id%>, <%=@post_var['watermark']%>, 
+          <%=@post_var['percentile']%>, <%=@post_var['start_epoch']%>, 
+          <%=@post_var['end_epoch']%>)" type="button" value="Chart it!">
+        </td>
       </tr>
     <% end %>
   </tbody>

@@ -103,7 +103,7 @@ InterfaceGroup.all.each do |int_group|
       arrayOfX = arrayOfX_unfiltered.shift(sliceSize)
       arrayOfY = arrayOfY_unfiltered.shift(sliceSize)
 
-      if arrayOfX.length > 0
+      if arrayOfX.length == sliceSize and arrayOfY.length == sliceSize
         #find mean 
         arrayOfX_sum = 0
         arrayOfX.each do |x|

@@ -5,7 +5,7 @@ require 'mongo'
 include Mongo
 gem 'activerecord'
 require 'active_record'
-
+require 'net/smtp'
 
 #CHANGE ME TO FIT YOUR ENVIRONMENT!!
 simpacity_base = '/opt/simpacity-dev'
@@ -53,14 +53,21 @@ Alert.all.each do |alert|
 
             #check if there are at least xx% of the expected noids.  TODO - This is a bad way to do this, use a where to grab first and last instead
             (temp_times, temp_gauges) = get_int_measurements(int.id, alert.percentile, noidName, start_epoch, end_epoch)
-            next if temp_times.length == 0
+
+            #ensure there are more than zero measurements and more than 10bps average
+            temp_g = int.averages.where(:percentile => alert.percentile, :noid => noidName).first
+            if temp_times.length == 0 or !temp_g or temp_g.gauge <= 10 
+              puts "DEBUG: ignoring this interface as it either does not have enough measurements or an average"
+              int.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
+              next 
+            end
+            
             measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
             alert_lookback_duration = end_epoch - start_epoch
 
             puts "  Debug measurements length #{measurement_duration_sec} #{min_alert_measurements_percent * alert_lookback_duration}"
 
             projection = get_int_projection(int.id, alert.percentile, noidName, start_epoch, end_epoch, alert.watermark, Setting.first.max_trending_future_days)
-            #puts projection.inspect
             puts "  "
             #skip this alert if we are not already in an exhaustion situation and we dont think there will be enough measurements
             if projection > 1 and measurement_duration_sec < (min_alert_measurements_percent * alert_lookback_duration)
@@ -68,15 +75,13 @@ Alert.all.each do |alert|
               #if there is an alert for this already, delete it
               int.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
               next
-            elsif projection <= alert.days_out
+            elsif projection <= alert.days_out 
               #generate alert
               puts "    Alert fired for Alert.name: #{alert.name}, Int.id: #{int.id}, Int.device.hostname: #{int.device.hostname}, Int.name: #{int.name}, Record: #{noidName}, Projection: #{projection}"
-              alert_log_entry = int.alert_logs.where(:noid => noidName, :alert_id => alert.id).first
-              if alert_log_entry
-                alert_log_entry.update(:noid => noidName, :projection => projection.days.from_now, :alert_id => alert.id)
-              else
-                int.alert_logs.create(:noid => noidName, :projection => projection.days.from_now, :alert_id => alert.id)
-              end
+              alert_log_entry = int.alert_logs.find_or_initialize_by(:noid => noidName, :alert_id => alert.id)
+              alert_log_entry.projection = projection.days.from_now
+              alert_log_entry.save
+              #send email Alert.first.contact_group.email_addresses
             else
               #if there is an alert for this already, delete it
               int.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
@@ -90,7 +95,15 @@ Alert.all.each do |alert|
         noidsToCollect.each do |noidName,noidShortName|
           #check if there are at least xx% of the expected noids. TODO - This is a bad way to do this, use a where to grab first and last instead
           (temp_times, temp_gauges) = get_int_group_measurements(int_group.id, alert.percentile, noidName, start_epoch, end_epoch)
-          next if temp_times.length == 0
+
+          #puts ":percentile => #{alert.percentile}, :noid => #{noidShortName}"
+          temp_g = int_group.averages.where(:percentile => alert.percentile, :noid => noidName).first
+          if temp_times.length == 0 or !temp_g or temp_g.gauge <= 10
+            puts "DEBUG: ignoring this interface group as it either does not have enough measurements or an average"
+            int_group.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
+            next
+          end
+            
           measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
           alert_lookback_duration = end_epoch - start_epoch
 
@@ -107,12 +120,9 @@ Alert.all.each do |alert|
           elsif projection <= alert.days_out
             #generate alert
             puts "Alert fired for Alert.name: #{alert.name}, Int_group.id: #{int_group.id}, Int_group.name: #{int_group.name}, Record: #{noidName}, Projection: #{projection}"
-            alert_log_entry = int_group.alert_logs.where(:noid => noidName, :alert_id => alert.id).first
-            if alert_log_entry
-              alert_log_entry.update(:noid => noidName, :projection => projection.days.from_now, :alert_id => alert.id)
-            else
-              int_group.alert_logs.create(:noid => noidName, :projection => projection.days.from_now, :alert_id => alert.id)
-            end
+            alert_log_entry = int_group.alert_logs.find_or_initialize_by(:noid => noidName, :alert_id => alert.id)
+            alert_log_entry.projection = projection.days.from_now
+            alert_log_entry.save
           else
             #if there is an alert for this already, delete it
             int_group.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
@@ -122,4 +132,49 @@ Alert.all.each do |alert|
     end
   end
 end
+
+
+### send email report
+
+ContactGroup.all.each do |contact|
+  report = ''
+
+  report += "<h3>Interface groups with a high alert level</h3>"
+  contact.alerts.where(:int_type => "interface-group", :severity => 5).each do |alert|
+    alert.alert_logs.each do |alert_log|
+      int_group = InterfaceGroup.find(alert_log.alertable_id)
+      report += "<b>InterfaceGroup:#{int_group.name}</b><br>"
+      report += "Projection:#{alert_log.projection}, Record:#{alert_log.noid}, Bandwidth:#{'asd'}, Average:#{'asd'}<br>"
+    end
+  end
+  report += "<br><br>"
+  report += "<h3>Interfaces with a high alert level</h3>"
+  contact.alerts.where(:int_type => "interface", :severity => 5).each do |alert|
+    alert.alert_logs.each do |alert_log|
+      int = Interface.find(alert_log.alertable_id)
+      avg = int.averages.where(:percentile => alert.percentile).collect {|avgs| "#{avgs.noid} - #{avgs.gauge}bps"}
+      report += "<b>Device:#{int.device.hostname}, Interface:#{int.name}</b><br>"
+      report += "Projection:#{alert_log.projection}, Record:#{alert_log.noid}, Bandwidth:#{int.bandwidth}bps, Average:#{avg}<br>"
+    end
+  end
+
+
+
+message = <<MESSAGE_END
+From: Simpacity <noreply@rackspace.com>
+To: <andrew.edwards@rackspace.com>
+MIME-Version: 1.0
+Content-type: text/html
+Subject: Simpacity Alert
+
+#{report}
+
+MESSAGE_END
+
+  Net::SMTP.start('localhost') do |smtp|
+    smtp.send_message message, 'noreply@rackspace.com', 
+                               contact.email_addresses.split(',').map(&:strip)
+  end
+end
+
 

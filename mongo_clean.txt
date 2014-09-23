@@ -1,0 +1,145 @@
+db.runCommand ( { compact: 'host.p3.dfw2'})
+db.runCommand ( { compact: 'host.bbr1.dfw30'})
+
+db.runCommand ({ compact: 'host.bbr1.ord1'})
+db.runCommand ({ compact: 'host.edge1.dfw1'})
+db.runCommand ({ compact: 'host.edge1.ord1'})
+db.runCommand ({ compact: 'host.edge1.syd2'})
+db.runCommand ({ compact: 'host.edge2.hkg1'})
+
+
+db.runCommand ({ compact: 'host.edge2.lon'})
+db.runCommand ({ compact: 'host.edge2.ord1'})
+db.runCommand ({ compact: 'host.edge2.syd2'})
+db.runCommand ({ compact: 'host.edge3.lon'})
+db.runCommand ({ compact: 'host.edge3.ord1'})
+db.runCommand ({ compact: 'host.edge3.syd30'})
+db.runCommand ({ compact: 'host.edge4.dfw30'})
+
+db.runCommand ({ compact: 'host.edge4.hkg30'})
+db.runCommand ({ compact: 'host.edge4.lon3'})
+db.runCommand ({ compact: 'host.edge4.ord1'})
+
+
+db.runCommand ({ compact: 'host.edge4.syd31'})
+db.runCommand ({ compact: 'host.edge5.dfw31'})
+db.runCommand ({ compact: 'host.edge5.iad3'})
+
+db.runCommand ({ compact: 'host.edge5.lon3'})
+db.runCommand ({ compact: 'host.edge6.iad2'})
+db.runCommand ({ compact: 'host.edge6.lon3'})
+db.runCommand ({ compact: 'host.edge7.iad30'})
+db.runCommand ({ compact: 'host.edge7.lon31'})
+db.runCommand ({ compact: 'host.edge8.iad30'})
+db.runCommand ({ compact: 'host.p1.dfw1'})
+db.runCommand ({ compact: 'host.p1.iad3'})
+db.runCommand ({ compact: 'host.p1.lon3'})
+db.runCommand ({ compact: 'host.p1.ord1'})
+db.runCommand ({ compact: 'host.p2.dfw1'})
+
+db.runCommand ({ compact: 'host.p2.iad2'})
+db.runCommand ({ compact: 'host.p2.lon3'})
+db.runCommand ({ compact: 'host.p2.ord1'})
+db.runCommand ({ compact: 'host.p3.dfw2'})
+db.runCommand ({ compact: 'host.p3.iad1'})
+db.runCommand ({ compact: 'host.p4.dfw2'})
+db.runCommand ({ compact: 'host.p4.iad1'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+db.host.edge1.hkg1.drop()
+db.host.edge1.iad1.drop()
+db.host.edge1.iad3.drop()
+db.host.edge1.lon.drop()
+db.host.edge1.odr1.drop()
+db.host.edge2.dfw1.drop()
+db.host.edge2.iad1.drop()
+db.host.edge2.odr1.drop()
+db.host.edge3.dfw1.drop()
+db.host.edge3.dfw30.drop()
+db.host.edge3.hkg1.drop()
+db.host.edge3.iad1.drop()
+db.host.edge3.odr1.drop()
+
+
+db.host.edge4.dfw1.drop()
+db.host.edge4.iad2.drop()
+db.host.edge4.odr1.drop()
+db.host.edge5.dfw1.drop()
+db.host.edge5.odr1.drop()
+db.host.edge5.ord1.drop()
+db.host.edge6.dfw1.drop()
+
+
+db....find({'_id' => {:$lt => 1391113575})
+
+db.host.bbr1.dfw30.find({'_id': {$lt: 1391113575}}).count()
+
+use zpoller_dev
+
+db.host.bbr1.dfw30.remove({'_id': {$lt: 1391113575}})
+
+
+
+
+
+
+test db.host.bbr1.ord1.find({'_id': {$lt: 1391114575}}).count()
+
+db.host.bbr1.ord1.remove({'_id': {$lt: 1391113575}})
+db.host.edge1.dfw1.remove({'_id': {$lt: 1391113575}})
+db.host.edge1.ord1.remove({'_id': {$lt: 1391113575}})
+db.host.edge1.syd2.remove({'_id': {$lt: 1391113575}})
+db.host.edge2.hkg1.remove({'_id': {$lt: 1391113575}})
+db.host.edge2.lon.remove({'_id': {$lt: 1391113575}})
+db.host.edge2.ord1.remove({'_id': {$lt: 1391113575}})
+db.host.edge2.syd2.remove({'_id': {$lt: 1391113575}})
+db.host.edge3.lon.remove({'_id': {$lt: 1391113575}})
+db.host.edge3.ord1.remove({'_id': {$lt: 1391113575}})
+db.host.edge3.syd30.remove({'_id': {$lt: 1391113575}})
+
+
+
+
+db.host.edge4.dfw30.remove({'_id': {$lt: 1391113575}})
+db.host.edge4.hkg30.remove({'_id': {$lt: 1391113575}})
+db.host.edge4.lon3.remove({'_id': {$lt: 1391113575}})
+db.host.edge4.ord1.remove({'_id': {$lt: 1391113575}})
+db.host.edge4.syd31.remove({'_id': {$lt: 1391113575}})
+db.host.edge5.dfw31.remove({'_id': {$lt: 1391113575}})
+db.host.edge5.iad3.remove({'_id': {$lt: 1391113575}})
+db.host.edge5.lon3.remove({'_id': {$lt: 1391113575}})
+db.host.edge6.iad2.remove({'_id': {$lt: 1391113575}})
+db.host.edge6.lon3.remove({'_id': {$lt: 1391113575}})
+db.host.edge7.iad30.remove({'_id': {$lt: 1391113575}})
+db.host.edge7.lon31.remove({'_id': {$lt: 1391113575}})
+db.host.edge8.iad30.remove({'_id': {$lt: 1391113575}})
+db.host.p1.dfw1.remove({'_id': {$lt: 1391113575}})
+db.host.p1.iad3.remove({'_id': {$lt: 1391113575}})
+db.host.p1.lon3.remove({'_id': {$lt: 1391113575}})
+
+
+
+db.host.p1.ord1.remove({'_id': {$lt: 1391113575}})
+db.host.p2.dfw1.remove({'_id': {$lt: 1391113575}})
+db.host.p2.iad2.remove({'_id': {$lt: 1391113575}})
+db.host.p2.lon3.remove({'_id': {$lt: 1391113575}})
+db.host.p2.ord1.remove({'_id': {$lt: 1391113575}})
+db.host.p3.dfw2.remove({'_id': {$lt: 1391113575}})
+db.host.p3.iad1.remove({'_id': {$lt: 1391113575}})
+db.host.p4.dfw2.remove({'_id': {$lt: 1391113575}})
+db.host.p4.iad1.remove({'_id': {$lt: 1391113575}})
+
