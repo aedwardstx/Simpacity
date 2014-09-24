@@ -139,30 +139,35 @@ end
 ContactGroup.all.each do |contact|
   report = ''
 
-  report += "<h3>Interface groups with a high alert level</h3>"
+  report += "<h3>Interface groups with a high alert level</h3>\n"
   contact.alerts.where(:int_type => "interface-group", :severity => 5).each do |alert|
     alert.alert_logs.each do |alert_log|
       int_group = InterfaceGroup.find(alert_log.alertable_id)
-      report += "<b>InterfaceGroup:#{int_group.name}</b><br>"
-      report += "Projection:#{alert_log.projection}, Record:#{alert_log.noid}, Bandwidth:#{'asd'}, Average:#{'asd'}<br>"
+      int_group_bw = get_int_group_bandwidth(int_group.id)
+      avg = int_group.averages.where(:percentile => alert.percentile).collect {|avgs| "#{avgs.noid} - #{avgs.gauge / 1000000}mbps"}
+      percentile = 100 - alert.percentile
+      report += "<b>InterfaceGroup:#{int_group.name}</b><br>\n"
+      report += "Percentile:#{percentile}, Watermark Exceed Projection:#{alert_log.projection}<br>\n" 
+      report += "Record:#{alert_log.noid}, Bandwidth:#{int_group_bw / 1000000}mbps, Average:#{avg}<br>\n"
     end
   end
-  report += "<br><br>"
-  report += "<h3>Interfaces with a high alert level</h3>"
+  report += "<br><br>\n"
+  report += "<h3>Interfaces with a high alert level</h3>\n"
   contact.alerts.where(:int_type => "interface", :severity => 5).each do |alert|
     alert.alert_logs.each do |alert_log|
       int = Interface.find(alert_log.alertable_id)
-      avg = int.averages.where(:percentile => alert.percentile).collect {|avgs| "#{avgs.noid} - #{avgs.gauge}bps"}
-      report += "<b>Device:#{int.device.hostname}, Interface:#{int.name}</b><br>"
-      report += "Projection:#{alert_log.projection}, Record:#{alert_log.noid}, Bandwidth:#{int.bandwidth}bps, Average:#{avg}<br>"
+      avg = int.averages.where(:percentile => alert.percentile).collect {|avgs| "#{avgs.noid} - #{avgs.gauge / 1000000}mbps"}
+      percentile = 100 - alert.percentile
+      report += "<b>Device:#{int.device.hostname}, Interface:#{int.name}</b><br>\n"
+      report += "Percentile:#{percentile}, Watermark Exceed Projection:#{alert_log.projection}<br>\n" 
+      report += "Record:#{alert_log.noid}, Bandwidth:#{int.bandwidth / 1000000}mbps, Average:#{avg}<br>\n"
     end
   end
 
 
-
 message = <<MESSAGE_END
-From: Simpacity <noreply@rackspace.com>
-To: <andrew.edwards@rackspace.com>
+From: SimpacityAlerter <noreply@rackspace.com>
+To: <#{contact.email_addresses.gsub(/\s+/, "").gsub(/,/, '>, <')}>
 MIME-Version: 1.0
 Content-type: text/html
 Subject: Simpacity Alert
