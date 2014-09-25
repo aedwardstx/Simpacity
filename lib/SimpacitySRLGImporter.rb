@@ -105,14 +105,19 @@ InterfaceGroup.all.each do |int_group|
 
       if arrayOfX.length == sliceSize and arrayOfY.length == sliceSize
         #find mean 
-        arrayOfX_sum = 0
-        arrayOfX.each do |x|
-          arrayOfX_sum += x
-        end
-        sampleX = arrayOfX_sum / arrayOfX.length
+        sampleX = arrayOfX.reduce(:+) / arrayOfX.length
 
+        arrayOfX_count = arrayOfX.count
         percentiles.each do |percentile|
-          sampleY = arrayOfY.sort[-percentile..-1].inject{ |sum, element| sum + element }.to_f / percentile 
+          if percentile == 100
+            #get the average as 100 mean average
+            sampleY = arrayOfY.reduce(:+) / arrayOfX_count
+          else
+            #get the percentile
+            indexToGrab = ((100 - percentile).to_f / 100 * arrayOfX_count).ceil - 1
+            sampleY = arrayOfY.sort[indexToGrab].to_i
+          end
+
           puts "Debug -- insert into AR - Int_Group=#{int_group.name},noid=#{noidName},percentile=#{percentile},collected_at=#{sampleX},gauge=#{sampleY}"
 
           #update noids in AR

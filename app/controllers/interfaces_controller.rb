@@ -17,7 +17,7 @@ class InterfacesController < ApplicationController
       matches << int.id if match == true
     end
     
-    matching_ints = Interface.find_all_by_id(matches)
+    matching_ints = Interface.where(:id => matches)
     #interfaces = Interface.where("name like ?", "%#{params[:q]}%")
     #devices = Interface.device.where("hostname like ?", "%#{params[:q]}%")
     respond_to do |format|

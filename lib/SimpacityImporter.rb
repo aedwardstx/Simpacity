@@ -11,9 +11,6 @@ simpacity_base = '/opt/simpacity-dev'
 
 require "#{simpacity_base}/lib/SimpacityExtensionCommon.rb"
 
-#for testing
-#require 'object_graph'
-
 @min_Bps_for_inclusion = Setting.first.min_bps_for_inclusion / 8 
 @polling_interval_secs = Setting.first.polling_interval_secs
 
@@ -53,6 +50,7 @@ def getRawMeasurements(hostname, interface, noidName, starting_point_epoch, slic
       puts "skipping measurement as not defined -- this should never really happen"
     end
   end
+
   return xvals, yvals
 end
   
@@ -75,23 +73,31 @@ Interface.all.each do |int|
       #load the raw data for the day if not loaded already
       (arrayOfX,arrayOfY) = getRawMeasurements(int.device.hostname, int.name, noidShortName, starting_point_epoch, sliceSize)
 
-      if arrayOfX.length > 0
+      #should add a check here to prevent this from rening unless the sliceSize is satisfied
+      #if arrayOfX.length > 0
+      if arrayOfX.length == sliceSize and arrayOfY.length == sliceSize
         #find mean 
-        arrayOfX_sum = 0
-        arrayOfX.each do |x|
-          arrayOfX_sum += x
-        end
-        sampleX = arrayOfX_sum / arrayOfX.length
+        sampleX = arrayOfX.reduce(:+) / arrayOfX.length
+
         arrayOfX_count = arrayOfX.count
         #puts "#{arrayOfX_count}/#{arrayOfY.count}"
         percentiles.each do |percentile|
           
           #In order to keep the sort target from returning nil, have to handle the percentile averaging differently
-          if arrayOfX_count < percentile #percentile is larger than arrayOfX_count
-            sampleY = arrayOfY.inject{ |sum, element| sum + element }.to_f / arrayOfX_count
-          else #percentile is less than or equal to arrayOfX_count
-            sampleY = arrayOfY.sort[-percentile..-1].inject{ |sum, element| sum + element }.to_f / percentile 
+          #if arrayOfX_count < percentile #percentile is larger than arrayOfX_count
+          #  sampleY = arrayOfY.inject{ |sum, element| sum + element }.to_f / arrayOfX_count
+          #else #percentile is less than or equal to arrayOfX_count
+            #sampleY = arrayOfY.sort[-percentile..-1].inject{ |sum, element| sum + element }.to_f / percentile 
+          
+          if percentile == 100
+            #get the average as 100 mean average
+            sampleY = arrayOfY.reduce(:+) / arrayOfX_count
+          else
+            #get the percentile
+            indexToGrab = ((100 - percentile).to_f / 100 * arrayOfX_count).ceil - 1 
+            sampleY = arrayOfY.sort[indexToGrab].to_i 
           end
+          #end
 
           puts "Debug -- insert into AR - hostname=#{int.device.hostname},interface=#{int.name},noid=#{noidName},percentile=#{percentile},collected_at=#{sampleX},gauge=#{sampleY}"
 
@@ -113,6 +119,4 @@ Interface.all.each do |int|
       break
     end
   end
-  GC.start()
 end
-
