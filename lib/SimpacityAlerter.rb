@@ -50,18 +50,25 @@ Alert.all.each do |alert|
         if ((int.link_type.id == alert.link_type.id) and !!("#{int.name}#{int.description}".match(/#{alert.match_regex}/)))
           #foreach noid to collect
           noidsToCollect.each do |noidName,noidShortName|
-
-            #check if there are at least xx% of the expected noids.  TODO - This is a bad way to do this, use a where to grab first and last instead
             (temp_times, temp_gauges) = get_int_measurements(int.id, alert.percentile, noidName, start_epoch, end_epoch)
-
             #ensure there are more than zero measurements and more than 10bps average
             temp_g = int.averages.where(:percentile => alert.percentile, :noid => noidName).first
             if temp_times.length == 0 or !temp_g or temp_g.gauge <= 10 
               puts "DEBUG: ignoring this interface as it either does not have enough measurements or an average"
               int.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
               next 
+            elsif temp_g.gauge < int.bandwidth * alert.watermark
+              if not temp_times[0].between?(start_epoch, start_epoch+260000)  
+                puts "temp_times: #{temp_times[0]}, start_epoch: #{start_epoch} out of bounds, probably not enough measurements"
+                int.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
+                next
+              elsif not temp_times[-1].between?(end_epoch-260000, end_epoch) 
+                puts "temp_times: #{temp_times[-1]}, end_epoch: #{end_epoch} out of bounds, probably not enough measurements"
+                int.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
+                next
+              end
             end
-            
+
             measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
             alert_lookback_duration = end_epoch - start_epoch
 
@@ -93,17 +100,28 @@ Alert.all.each do |alert|
       InterfaceGroup.all.each do |int_group|
         #foreach noid to collect
         noidsToCollect.each do |noidName,noidShortName|
-          #check if there are at least xx% of the expected noids. TODO - This is a bad way to do this, use a where to grab first and last instead
           (temp_times, temp_gauges) = get_int_group_measurements(int_group.id, alert.percentile, noidName, start_epoch, end_epoch)
 
           #puts ":percentile => #{alert.percentile}, :noid => #{noidShortName}"
           temp_g = int_group.averages.where(:percentile => alert.percentile, :noid => noidName).first
+          int_group_bw = get_int_group_bandwidth(int_group.id)
           if temp_times.length == 0 or !temp_g or temp_g.gauge <= 10
             puts "DEBUG: ignoring this interface group as it either does not have enough measurements or an average"
             int_group.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
             next
+          elsif temp_g.gauge < (int_group_bw * alert.watermark)
+            if not temp_times[0].between?(start_epoch, start_epoch+260000) 
+              puts "temp_times: #{temp_times[0]}, start_epoch: #{start_epoch} out of bounds, probably not enough measurements"
+              int_group.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
+              next
+            elsif not temp_times[-1].between?(end_epoch-260000, end_epoch) 
+              puts "temp_times: #{temp_times[-1]}, end_epoch: #{end_epoch} out of bounds, probably not enough measurements"
+              int_group.alert_logs.where(:noid => noidName, :alert_id => alert.id).destroy_all
+              next
+            end
           end
-            
+
+
           measurement_duration_sec = temp_times.sort[-1] - temp_times.sort[0]
           alert_lookback_duration = end_epoch - start_epoch
 

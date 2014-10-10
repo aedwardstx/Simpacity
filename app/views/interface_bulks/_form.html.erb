@@ -19,7 +19,7 @@
             <td><%= select_tag "ints[#{val['name']}][link_type_id]", options_for_select(LinkType.all.collect {|link_type| [ link_type.name, link_type.id]}, val['link_type_id']) %></td>
             <td><%= val['name'] %></td>
             <td><%= val['description'] %></td>
-            <td><%= val['bandwidth'] %></td>
+            <td><%= number_to_human_size(val['bandwidth'], :precision => 4, :prefix => :si, :locale => :simpacity_custom)%></td>
           </tr>
         <% end %>
       </tbody>

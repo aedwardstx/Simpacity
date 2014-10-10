@@ -15,7 +15,8 @@ class Interface < ActiveRecord::Base
 
   validates_presence_of :device
   validates_presence_of :link_type_id
-  validates_presence_of :description
+  #sometimes, an interfaces description fails to be grabbed from zpoller db, fix this 
+  #validates_presence_of :description
   validates_presence_of :name
   validates_presence_of :bandwidth
   
