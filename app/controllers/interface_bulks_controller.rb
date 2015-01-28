@@ -17,7 +17,7 @@ class InterfaceBulksController < ApplicationController
     get_interfaces_for_device(device.id).each do |int|
       #if not already in @bulk_ints and the interface name does not contain a period, which causes issues for int health check and importer for some reason
       if not @bulk_ints['ints'].any? {|h| h['name'] == int} 
-        if int !~ /\./ and int !~ /dwdm/ and int !~ /Tu\d/ and int !~ /Lo\d/ and int !~ /Vo\d/ and int !~ /Nu\d/ and int !~ /Null\d/ and int !~ /Mgmt/ and int !~ /Loop/ and int !~ /GM0/ and int !~ /Gi0$/
+        if int !~ /\./ and int !~ /dwdm/ and int !~ /Tu\d/ and int !~ /Lo\d/ and int !~ /Vo\d/ and int !~ /Nu\d/ and int !~ /Null\d/ and int !~ /Mgmt/ and int !~ /Loop/ and int !~ /GM0/ and int !~ /Gi0$/ and int !~ /tunnel/
           (bandwidth,description) = get_interface_metadata_by_name(hostname,int)
           @bulk_ints['ints'] << {'int_id'=>nil,'used'=>'no','name'=>int,'link_type'=>nil,'description'=>description,'bandwidth'=>bandwidth}
         end

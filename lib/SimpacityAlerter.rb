@@ -158,27 +158,43 @@ ContactGroup.all.each do |contact|
   report = ''
 
   report += "<h3>Interface groups with a high alert level</h3>\n"
+  report += '<table style="width:100%">'
+  report += '<tr><th>Group Name</th><th>Percentile</th><th>Watermark Exceed Projection</th><th>Record</th><th>Bandwidth</th><th>Averages</th></tr>'
   contact.alerts.where(:int_type => "interface-group", :severity => 5).each do |alert|
     alert.alert_logs.each do |alert_log|
       int_group = InterfaceGroup.find(alert_log.alertable_id)
       int_group_bw = get_int_group_bandwidth(int_group.id)
       avg = int_group.averages.where(:percentile => alert.percentile).collect {|avgs| "#{avgs.noid} - #{avgs.gauge / 1000000}mbps"}
       percentile = 100 - alert.percentile
-      report += "<b>InterfaceGroup:#{int_group.name}</b><br>\n"
-      report += "Percentile:#{percentile}, Watermark Exceed Projection:#{alert_log.projection}<br>\n" 
-      report += "Record:#{alert_log.noid}, Bandwidth:#{int_group_bw / 1000000}mbps, Average:#{avg}<br>\n"
+      report += '<tr>'
+      report += "<td>#{int_group.name}</td>\n"
+      report += "<td>#{percentile}</td>\n"
+      report += "<td>#{alert_log.projection}</td>\n" 
+      report += "<td>#{alert_log.noid}</td>\n" 
+      report += "<td>#{int_group_bw / 1000000}mbps</td>\n" 
+      report += "<td>#{avg}</td>\n"
+      report += '</tr>'
     end
   end
+  report += '</tr></table>'
   report += "<br><br>\n"
   report += "<h3>Interfaces with a high alert level</h3>\n"
+  report += '<table style="width:100%">'
+  report += '<tr><th>Interface Name</th><th>Interface</th><th>Percentile</th><th>Watermark Exceed Projection</th><th>Record</th><th>Bandwidth</th><th>Averages</th></tr>'
   contact.alerts.where(:int_type => "interface", :severity => 5).each do |alert|
     alert.alert_logs.each do |alert_log|
       int = Interface.find(alert_log.alertable_id)
       avg = int.averages.where(:percentile => alert.percentile).collect {|avgs| "#{avgs.noid} - #{avgs.gauge / 1000000}mbps"}
       percentile = 100 - alert.percentile
-      report += "<b>Device:#{int.device.hostname}, Interface:#{int.name}</b><br>\n"
-      report += "Percentile:#{percentile}, Watermark Exceed Projection:#{alert_log.projection}<br>\n" 
-      report += "Record:#{alert_log.noid}, Bandwidth:#{int.bandwidth / 1000000}mbps, Average:#{avg}<br>\n"
+      report += '<tr>'
+      report += "<td>#{int.device.hostname}</td>\n"
+      report += "<td>#{int.name}</td>\n"
+      report += "<td>#{percentile}</td>\n" 
+      report += "<td>#{alert_log.projection}</td>\n" 
+      report += "<td>#{alert_log.noid}</td>\n"
+      report += "<td>#{int.bandwidth / 1000000}mbps</td>\n"
+      report += "<td>#{avg}<td>\n"
+      report += '</tr>'
     end
   end
 
